@@ -1,0 +1,79 @@
+{{- if .Values.global.installMongo }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  namespace: {{ $.Values.global.namespace }}
+  labels:
+    app: mongodb
+spec:
+  serviceName: mongodb-service
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - bash
+            - -c
+            - |
+              mongod --bind_ip_all --fork --logpath /data/db/mongod.log
+              sleep 10
+              echo "MongoDB started, creating users..."
+              mongosh admin --eval '
+                db.createUser({
+                  user: {{ .Values.global.mongodb.username | quote }},
+                  pwd: {{ .Values.global.mongodb.password | quote }},
+                  roles: [
+                    { role: "root", db: "admin" }
+                  ]
+                });'
+              
+              echo "Elchi user created"
+              mongod --shutdown
+              sleep 5
+              
+              echo "Restarting MongoDB..."
+              exec mongod --bind_ip_all --auth
+          ports:
+            - containerPort: 27017
+              name: mongodb
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: {{ .Values.global.mongodb.password | quote }}
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: "root"
+            - name: MONGO_INITDB_DATABASE
+              value: {{ .Values.global.mongodb.database | quote }}
+          volumeMounts:
+            - name: mongodb-data
+              mountPath: /data/db
+            - name: mongodb-init
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: mongodb-init
+          configMap:
+            name: mongodb-init
+  volumeClaimTemplates:
+    - metadata:
+        name: mongodb-data
+        annotations:
+          "helm.sh/hook-delete-policy": before-hook-creation
+          "helm.sh/resource-policy": delete
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: {{ .Values.persistence.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size }}
+{{- end }} 

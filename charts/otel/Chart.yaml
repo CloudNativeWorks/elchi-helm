@@ -1,0 +1,6 @@
+apiVersion: v2
+name: otel
+description: OpenTelemetry Collector for metrics processing and forwarding
+type: application
+version: 1.0.0
+appVersion: "0.89.0" 

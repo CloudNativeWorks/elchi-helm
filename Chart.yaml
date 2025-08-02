@@ -1,0 +1,54 @@
+apiVersion: v2
+name: elchi-stack
+description: Helm chart for deploying Elchi Stack components
+type: application
+version: 1.0.0
+appVersion: "v0.1.0"
+kubeVersion: ">=1.19.0-0"
+icon: "https://chart.elchi.io/logo.png"
+
+home: https://chart.elchi.io
+sources:
+  - https://chart.elchi.io
+maintainers:
+  - name: Jhon Brown
+    email: admin@cloudnativeworks.com
+
+annotations:
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/license: MIT
+  helm.sh/hook-weight: "0"
+  meta.helm.sh/release-name: elchi-stack
+  meta.helm.sh/release-namespace: elchi-stack
+  app.kubernetes.io/managed-by: Helm
+  artifacthub.io/create-namespace: "true"
+  artifacthub.io/recommendations: |
+    - url: https://artifacthub.io/packages/helm/bitnami/mongodb
+      title: MongoDB (optional)
+  artifacthub.io/requirements: |
+    - Kubernetes 1.19+
+    - Helm 3.0.0+
+    - At least 2 CPU cores and 4GB RAM per node
+  artifacthub.io/valuesSchema: "true"
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/readme: "true"
+
+dependencies:
+  - name: elchi
+    version: "1.0.0"
+    repository: "file://charts/elchi"
+  - name: elchi-backend
+    version: "1.0.0"
+    repository: "file://charts/elchi-backend"
+  - name: envoy
+    version: "1.0.0"
+    repository: "file://charts/envoy"
+  - name: mongodb
+    version: "1.0.0"
+    repository: "file://charts/mongodb"
+  - name: otel
+    version: "1.0.0"
+    repository: "file://charts/otel"
+  - name: victoriametrics
+    version: "1.0.0"
+    repository: "file://charts/victoriametrics"

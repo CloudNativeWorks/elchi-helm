@@ -1,0 +1,48 @@
+name: Helm Chart Publish
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: 🔧 Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.10.0
+
+      - name: 📦 Package Helm Chart
+        run: |
+          helm package .
+
+      - name: 🚀 Clone Existing gh-pages Branch
+        run: |
+          git fetch origin gh-pages || echo "No gh-pages branch yet"
+          git checkout gh-pages || git checkout --orphan gh-pages
+
+      - name: 🔄 Ensure .nojekyll Exist
+        run: |
+          touch .nojekyll
+
+      - name: 🔄 Merge Existing index.yaml (Keep Old Versions)
+        run: |
+          if [ -f index.yaml ]; then
+            helm repo index . --merge index.yaml --url https://chart.elchi.io/
+          else
+            helm repo index . --url https://chart.elchi.io/
+          fi
+
+      - name: 🚀 Deploy to GitHub Pages (gh-pages)
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.GH_PAT }}
+          publish_dir: .
+          publish_branch: gh-pages
+          keep_files: true

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: elchi-backend
+description: Elchi Backend Applications Helm chart
+type: application
+version: 1.0.0
+appVersion: "0.1.0" 
