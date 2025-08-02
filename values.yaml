@@ -1,0 +1,28 @@
+global:
+  namespace: "elchi-stack"
+  mainAddress: "" # Required
+  port: ""  # If empty, will use 80 for HTTP or 443 for HTTPS based on tlsEnabled
+  tlsEnabled: false
+  versions:
+    - tag: v0.1.0-v0.13.4-envoy1.33.5
+    - tag: v0.1.0-v0.13.4-envoy1.34.2
+  installMongo: true
+  installVictoriaMetrics: true
+  internalCommunication: false
+  mongodb:
+    hosts: ""
+    username: "elchi"
+    password: "elchi"
+    database: "elchi"
+    scheme: ""
+    port: ""
+    replicaset: ""
+    timeoutMs: ""
+    tlsEnabled: ""
+    authSource: ""
+    authMechanism: ""
+  victoriametrics:
+    endpoint: "" # Required when installVictoriaMetrics is false (e.g., "http://external-vm.example.com:8428")
+  elchiBackend:
+    controlPlaneDefaultReplicas: 2
+    controllerDefaultReplicas: 2

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elchi
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: elchi
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: elchi
+  template:
+    metadata:
+      labels:
+        app: elchi
+    spec:
+      containers:
+        - name: elchi
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: config-volume
+              mountPath: /usr/share/nginx/html/config.js
+              subPath: config.js
+      volumes:
+        - name: config-volume
+          configMap:
+            name: elchi-config 
