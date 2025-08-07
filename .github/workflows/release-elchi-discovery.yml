@@ -43,25 +43,30 @@ jobs:
         helm dependency update charts/elchi-discovery
         helm package charts/elchi-discovery --destination .deploy
 
-    - name: Checkout gh-pages
+    - name: Prepare deployment directory
       if: steps.version_check.outputs.version_changed == 'true'
-      uses: actions/checkout@v3
-      with:
-        ref: gh-pages
-        path: gh-pages
+      run: |
+        mkdir -p .gh-pages
+        # Try to get existing gh-pages content if branch exists
+        git fetch origin gh-pages:gh-pages 2>/dev/null || echo "No gh-pages branch yet"
+        if git show-ref --verify --quiet refs/heads/gh-pages; then
+          git checkout gh-pages -- . 2>/dev/null || true
+          cp -r * .gh-pages/ 2>/dev/null || true
+          git checkout main
+        fi
 
     - name: Update Helm repository
       if: steps.version_check.outputs.version_changed == 'true'
       run: |
-        cp .deploy/*.tgz gh-pages/
-        cp artifacthub-repo.yml gh-pages/ 2>/dev/null || true
-        touch gh-pages/.nojekyll
-        echo "chart.elchi.io" > gh-pages/CNAME
+        cp .deploy/*.tgz .gh-pages/
+        cp artifacthub-repo.yml .gh-pages/ 2>/dev/null || true
+        touch .gh-pages/.nojekyll
+        echo "chart.elchi.io" > .gh-pages/CNAME
         # Preserve existing index.yaml and merge with new chart
-        if [ -f gh-pages/index.yaml ]; then
-          helm repo index gh-pages --merge gh-pages/index.yaml --url https://chart.elchi.io
+        if [ -f .gh-pages/index.yaml ]; then
+          helm repo index .gh-pages --merge .gh-pages/index.yaml --url https://chart.elchi.io
         else
-          helm repo index gh-pages --url https://chart.elchi.io
+          helm repo index .gh-pages --url https://chart.elchi.io
         fi
         
     - name: Deploy to GitHub Pages
@@ -69,5 +74,5 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: gh-pages
+        publish_dir: .gh-pages
         keep_files: true
