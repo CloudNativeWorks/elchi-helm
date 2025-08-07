@@ -2,7 +2,7 @@ apiVersion: v2
 name: elchi-discovery
 description: Service discovery and registry component for Elchi proxy management platform
 type: application
-version: 1.0.0
+version: 1.0.1
 appVersion: "v0.1.0"
 kubeVersion: ">=1.19.0-0"
 icon: "https://chart.elchi.io/logo.png"

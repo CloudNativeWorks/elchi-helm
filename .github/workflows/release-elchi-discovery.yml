@@ -62,6 +62,8 @@ jobs:
         cp artifacthub-repo.yml .gh-pages/ 2>/dev/null || true
         touch .gh-pages/.nojekyll
         echo "chart.elchi.io" > .gh-pages/CNAME
+        # Remove README files that interfere with index.yaml
+        rm -f .gh-pages/README.md .gh-pages/CLAUDE.md
         # Preserve existing index.yaml and merge with new chart
         if [ -f .gh-pages/index.yaml ]; then
           helm repo index .gh-pages --merge .gh-pages/index.yaml --url https://chart.elchi.io
