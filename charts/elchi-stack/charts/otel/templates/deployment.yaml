@@ -18,6 +18,7 @@ spec:
   template:
     metadata:
       labels:
+        app: otel-collector
         app.kubernetes.io/name: otel-collector
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/version: {{ .Chart.AppVersion }}

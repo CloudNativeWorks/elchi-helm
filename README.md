@@ -1,8 +1,17 @@
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/elchi-stack)](https://artifacthub.io/packages/search?repo=elchi-stack)
 
-# Elchi Stack Helm Charts
+# Elchi Proxy Management Platform - Helm Charts
 
-This repository contains Helm charts for deploying the Elchi Stack components including backend services, frontend, Envoy proxy, MongoDB, Victoria Metrics for monitoring, and OpenTelemetry collector.
+This repository contains Helm charts for deploying the **Elchi** - a comprehensive proxy management platform that provides UI-based configuration management for Envoy proxies.
+
+## 🚀 What is Elchi?
+
+Elchi is a proxy management platform that simplifies Envoy proxy configuration through a web-based interface:
+
+- **UI Frontend**: Web interface for creating and managing proxy configurations
+- **Controller**: Receives configurations from UI and stores them in MongoDB
+- **Control Plane**: Distributes configuration snapshots to Envoy proxies
+- **Registry**: Handles routing and service discovery between components
 
 ## Available Versions
 > Syntax: `<elchiBackendVersion>`-`<goControlPlaneVersion>`-`<envoyVersion>`
@@ -105,7 +114,7 @@ This repository contains Helm charts for deploying the Elchi Stack components in
 | `image.pullPolicy` | Image pull policy | `"IfNotPresent"` |
 | `persistence.enabled` | Enable persistence | `true` |
 | `persistence.size` | PVC size | `"3Gi"` |
-| `persistence.storageClass` | PVC storage class | `"local-path"` |
+| `persistence.storageClass` | PVC storage class | `"standard"` |
 | `service.type` | Kubernetes service type | `"ClusterIP"` |
 | `service.port` | Service port | `27017` |
 | `resources.requests.memory` | Memory request | `"256Mi"` |
@@ -123,7 +132,7 @@ This repository contains Helm charts for deploying the Elchi Stack components in
 | `service.type` | Kubernetes service type | `"ClusterIP"` |
 | `service.port` | Service port | `8428` |
 | `storage.size` | Storage size for metrics data | `"10Gi"` |
-| `storage.storageClass` | Storage class | `"local-path"` |
+| `storage.storageClass` | Storage class | `"standard"` |
 | `retentionPeriod` | Data retention period | `"30d"` |
 | `resources.requests.memory` | Memory request | `"256Mi"` |
 | `resources.requests.cpu` | CPU request | `"100m"` |
@@ -240,16 +249,32 @@ helm install my-elchi-stack elchi-stack/elchi-stack \
   --set-string global.victoriametrics.endpoint="external-vm.example.com:8428"
 ```
 
-## Architecture
+## 🏗️ Architecture
 
-The Elchi Stack consists of:
+```mermaid
+graph TB
+    UI[Elchi UI Frontend<br/>Web Interface] --> Controller[Controller<br/>Configuration Management]
+    Controller --> MongoDB[(MongoDB<br/>Configuration Storage)]
+    Controller --> Registry[Registry<br/>Service Discovery]
+    Registry --> ControlPlane[Control Plane<br/>Configuration Distribution]
+    ControlPlane --> Envoy[Envoy Proxies<br/>Apply Configuration]
+    
+    OTEL[OpenTelemetry Collector] --> VictoriaMetrics[(VictoriaMetrics<br/>Metrics Storage)]
+    Envoy -.-> OTEL
+    Controller -.-> OTEL
+    ControlPlane -.-> OTEL
+```
 
-- **Elchi Frontend**: React-based web application for system management
-- **Elchi Backend**: Go-based microservices (Controller, Control Plane, Registry)
-- **Envoy Proxy**: Load balancer and API gateway with advanced routing
-- **MongoDB**: Database for application data (optional - can use external)
-- **Victoria Metrics**: Time-series database for metrics storage (optional - can use external)
-- **OpenTelemetry Collector**: Metrics collection and forwarding to Victoria Metrics
+### Components:
+
+- **🎨 Elchi UI**: React-based web interface for proxy configuration management
+- **🎯 Controller**: Receives configurations from UI and validates/stores them in MongoDB
+- **🕹️ Control Plane**: Distributes configuration snapshots to Envoy proxy instances
+- **📡 Registry**: Handles service discovery and routing between components
+- **🌐 Envoy Proxy**: Load balancer and proxy
+- **🗄️ MongoDB**: Database for storing proxy configurations (optional - supports external)
+- **📊 VictoriaMetrics**: Time-series database for metrics storage (optional - supports external)
+- **📈 OpenTelemetry Collector**: Collects and forwards metrics to VictoriaMetrics
 
 ## Notes
 
