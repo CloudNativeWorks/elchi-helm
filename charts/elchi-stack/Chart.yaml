@@ -2,7 +2,7 @@ apiVersion: v2
 name: elchi-stack
 description: A comprehensive Helm chart for deploying Elchi proxy management platform with UI, controller, control plane and registry components
 type: application
-version: 1.0.0
+version: 1.0.1
 appVersion: "v0.1.0"
 kubeVersion: ">=1.19.0-0"
 icon: "https://chart.elchi.io/logo.png"
