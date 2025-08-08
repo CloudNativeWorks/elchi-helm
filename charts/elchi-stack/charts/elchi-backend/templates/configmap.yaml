@@ -11,12 +11,12 @@ data:
     ELCHI_ENABLE_DEMO: "true"
     ELCHI_VERSIONS: [{{- $versions := list }}{{- range .Values.global.versions }}{{- $envoyVersion := regexFind "envoy[0-9]+\\.[0-9]+\\.[0-9]+" .tag | replace "envoy" "v" }}{{- $versions = append $versions $envoyVersion }}{{- end }}{{- range $index, $version := $versions }}{{- if $index }}, {{ end }}'{{ $version }}'{{- end }}]
     ELCHI_INTERNAL_COMMUNICATION: {{ .Values.global.internalCommunication | quote }}
-    ELCHI_INTERNAL_ADDRESS_PORT: "envoy-service.{{ .Values.global.namespace }}.svc:8080"
+    ELCHI_INTERNAL_ADDRESS_PORT: "envoy-service.{{ .Values.global.namespace }}.svc.{{ .Values.global.clusterDomain }}:8080"
     ELCHI_NAMESPACE: {{ .Values.global.namespace | quote }}
     SMTP_PASSWORD: ""
 
     # Registry service configuration
-    REGISTRY_ADDRESS: "elchi-registry.{{ .Values.global.namespace }}.svc"
+    REGISTRY_ADDRESS: "elchi-registry.{{ .Values.global.namespace }}.svc.{{ .Values.global.clusterDomain }}"
     REGISTRY_PORT: {{ .Values.service.registry.port | quote }}
 
     {{- if .Values.global.installMongo }}

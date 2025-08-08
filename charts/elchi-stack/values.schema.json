@@ -10,6 +10,11 @@
                     "description": "Namespace where all components will be deployed",
                     "default": "elchi-stack"
                 },
+                "clusterDomain": {
+                    "type": "string",
+                    "description": "Kubernetes cluster domain suffix",
+                    "default": "cluster.local"
+                },
                 "mainAddress": {
                     "type": "string",
                     "description": "Base URL for the all components",

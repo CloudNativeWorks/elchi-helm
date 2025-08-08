@@ -163,7 +163,7 @@ data:
             - endpoint:
                 address:
                   socket_address:
-                    address: elchi-registry.{{ .Values.global.namespace }}.svc
+                    address: elchi-registry.{{ .Values.global.namespace }}.svc.{{ $.Values.global.clusterDomain }}
                     port_value: 9090
 
       # Controller REST cluster (all versions combined)
@@ -186,7 +186,7 @@ data:
             - endpoint:
                 address:
                   socket_address:
-                    address: elchi-controller-{{ regexReplaceAll "-arm64$" $version.tag "" | replace "." "-" }}-{{ $i }}.elchi-controller-{{ regexReplaceAll "-arm64$" $version.tag "" | replace "." "-" }}-headless.{{ $.Values.global.namespace }}.svc
+                    address: elchi-controller-{{ regexReplaceAll "-arm64$" $version.tag "" | replace "." "-" }}-{{ $i }}.elchi-controller-{{ regexReplaceAll "-arm64$" $version.tag "" | replace "." "-" }}-headless.{{ $.Values.global.namespace }}.svc.{{ $.Values.global.clusterDomain }}
                     port_value: 8099
             {{- end }}
             {{- end }}
@@ -221,7 +221,7 @@ data:
             - endpoint:
                 address:
                   socket_address:
-                    address: elchi-controller-{{ regexReplaceAll "-arm64$" $version.tag "" | replace "." "-" }}-{{ $i }}.elchi-controller-{{ regexReplaceAll "-arm64$" $version.tag "" | replace "." "-" }}-headless.{{ $.Values.global.namespace }}.svc
+                    address: elchi-controller-{{ regexReplaceAll "-arm64$" $version.tag "" | replace "." "-" }}-{{ $i }}.elchi-controller-{{ regexReplaceAll "-arm64$" $version.tag "" | replace "." "-" }}-headless.{{ $.Values.global.namespace }}.svc.{{ $.Values.global.clusterDomain }}
                     port_value: 50051
       {{- end }}
       {{- end }}
@@ -259,7 +259,7 @@ data:
             - endpoint:
                 address:
                   socket_address:
-                    address: elchi-control-plane-{{ regexReplaceAll "-arm64$" $version.tag "" | replace "." "-" }}-{{ $i }}.elchi-control-plane-{{ regexReplaceAll "-arm64$" $version.tag "" | replace "." "-" }}-headless.{{ $.Values.global.namespace }}.svc
+                    address: elchi-control-plane-{{ regexReplaceAll "-arm64$" $version.tag "" | replace "." "-" }}-{{ $i }}.elchi-control-plane-{{ regexReplaceAll "-arm64$" $version.tag "" | replace "." "-" }}-headless.{{ $.Values.global.namespace }}.svc.{{ $.Values.global.clusterDomain }}
                     port_value: 18000
       {{- end }}
       {{- end }}
@@ -276,7 +276,7 @@ data:
             - endpoint:
                 address:
                   socket_address:
-                    address: elchi.{{ $.Values.global.namespace }}.svc
+                    address: elchi.{{ $.Values.global.namespace }}.svc.{{ $.Values.global.clusterDomain }}
                     port_value: 80
 
       # OTEL cluster for metrics
@@ -299,7 +299,7 @@ data:
             - endpoint:
                 address:
                   socket_address:
-                    address: otel-collector.{{ $.Values.global.namespace }}.svc
+                    address: otel-collector.{{ $.Values.global.namespace }}.svc.{{ $.Values.global.clusterDomain }}
                     port_value: 4317
       # VictoriaMetrics cluster
       - name: victoriametrics-cluster
@@ -314,7 +314,7 @@ data:
                 address:
                   socket_address:
                     {{- if $.Values.global.installVictoriaMetrics }}
-                    address: victoriametrics.{{ $.Values.global.namespace }}.svc
+                    address: victoriametrics.{{ $.Values.global.namespace }}.svc.{{ $.Values.global.clusterDomain }}
                     port_value: 8428
                     {{- else }}
                     {{- if not $.Values.global.victoriametrics.endpoint }}

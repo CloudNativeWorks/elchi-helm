@@ -18,7 +18,7 @@ data:
         verbosity: detailed
       prometheusremotewrite:
         {{- if $.Values.global.installVictoriaMetrics }}
-        endpoint: "http://victoriametrics.{{ $.Values.global.namespace }}.svc:8428/api/v1/write"
+        endpoint: "http://victoriametrics.{{ $.Values.global.namespace }}.svc.{{ .Values.global.clusterDomain }}:8428/api/v1/write"
         {{- else }}
         {{- if not $.Values.global.victoriametrics.endpoint }}
         {{- fail "When installVictoriaMetrics is false, global.victoriametrics.endpoint must be provided" }}
