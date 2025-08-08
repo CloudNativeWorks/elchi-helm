@@ -1,0 +1,47 @@
+global:
+  namespace: "elchi-discovery"
+  clusterDomain: "cluster.local"
+  
+elchi-discovery-api:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: elchi/discovery-api
+    tag: v0.1.0
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 8080
+  
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+envoy:
+  enabled: true
+  replicaCount: 1
+  
+  service:
+    type: NodePort
+    ports:
+      http: 8080
+      admin: 9901
+  
+  config:
+    # Discovery-specific envoy configuration
+    discovery_mode: true
+
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: "redis-password"
+  
+  persistence:
+    enabled: true
+    size: 8Gi

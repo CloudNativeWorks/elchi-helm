@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: {{ .Values.global.namespace }}
+  name: {{ .Values.configMap.name }}
+data:
+  config-prod.yaml: |
+    ELCHI_ADDRESS: {{ .Values.global.mainAddress | quote }}
+    ELCHI_PORT: {{ if .Values.global.port }}{{ .Values.global.port | quote }}{{ else if .Values.global.tlsEnabled }}"443"{{ else }}"80"{{ end }}
+    ELCHI_TLS_ENABLED: {{ .Values.global.tlsEnabled | quote }}
+    ELCHI_ENABLE_DEMO: "true"
+    ELCHI_VERSIONS: [{{- $versions := list }}{{- range .Values.global.versions }}{{- $envoyVersion := regexFind "envoy[0-9]+\\.[0-9]+\\.[0-9]+" .tag | replace "envoy" "v" }}{{- $versions = append $versions $envoyVersion }}{{- end }}{{- range $index, $version := $versions }}{{- if $index }}, {{ end }}'{{ $version }}'{{- end }}]
+    ELCHI_INTERNAL_COMMUNICATION: {{ .Values.global.internalCommunication | quote }}
+    ELCHI_INTERNAL_ADDRESS_PORT: "envoy-service.{{ .Values.global.namespace }}.svc:8080"
+    ELCHI_NAMESPACE: {{ .Values.global.namespace | quote }}
+    SMTP_PASSWORD: ""
+
+    # Registry service configuration
+    REGISTRY_ADDRESS: "elchi-registry.{{ .Values.global.namespace }}.svc"
+    REGISTRY_PORT: {{ .Values.service.registry.port | quote }}
+
+    {{- if .Values.global.installMongo }}
+    # Self-service MongoDB configuration
+    MONGODB_HOSTS: "mongodb-service.{{ .Values.global.namespace }}"
+    MONGODB_USERNAME: {{ default "elchi" .Values.global.mongodb.username | quote }}
+    MONGODB_PASSWORD: {{ default "elchi" .Values.global.mongodb.password | quote }}
+    MONGODB_DATABASE: {{ default "elchi" .Values.global.mongodb.database | quote }}
+    MONGODB_SCHEME: "mongodb"
+    MONGODB_PORT: "27017"
+    MONGODB_TIMEOUTMS: "5000"
+    MONGODB_TLS_ENABLED: "false"
+    MONGODB_AUTH_SOURCE: "admin"
+    MONGODB_AUTH_MECHANISM: "SCRAM-SHA-1"
+    {{- else }}
+    # External MongoDB configuration
+    {{- if not .Values.global.mongodb.hosts }}
+    {{- fail "When installMongo is false, global.mongodb.hosts must be provided" }}
+    {{- end }}
+    MONGODB_HOSTS: {{ .Values.global.mongodb.hosts | quote }}
+    MONGODB_USERNAME: {{ .Values.global.mongodb.username | quote }}
+    MONGODB_PASSWORD: {{ .Values.global.mongodb.password | quote }}
+    MONGODB_DATABASE: {{ .Values.global.mongodb.database | quote }}
+    MONGODB_SCHEME: {{ default "mongodb" .Values.global.mongodb.scheme | quote }}
+    MONGODB_PORT: {{ default "27017" .Values.global.mongodb.port | quote }}
+    MONGODB_TIMEOUTMS: {{ default "5000" .Values.global.mongodb.timeoutMs | quote }}
+    MONGODB_TLS_ENABLED: {{ default "false" .Values.global.mongodb.tlsEnabled | quote }}
+    MONGODB_AUTH_SOURCE: {{ default "admin" .Values.global.mongodb.authSource | quote }}
+    MONGODB_AUTH_MECHANISM: {{ default "SCRAM-SHA-1" .Values.global.mongodb.authMechanism | quote }}
+    {{- end }}
+
+    LOGGING:
+      level: {{ .Values.config.logging.level }}
+      format: {{ .Values.config.logging.formatter }}
+      output_path: stdout
+      modules:
+        controller: debug
+        controlplane: debug
+        elchi-client: debug
+        grpc_server: debug
+
+    LOG_REPORTCALLER: {{ .Values.config.logging.reportCaller | quote }}

@@ -1,0 +1,40 @@
+apiVersion: v2
+name: elchi-discovery
+description: Service discovery and registry component for Elchi proxy management platform
+type: application
+version: 1.0.0
+appVersion: "v0.1.0"
+kubeVersion: ">=1.19.0-0"
+icon: "https://chart.elchi.io/logo.png"
+keywords:
+  - service-discovery
+  - registry
+  - envoy
+  - proxy
+  - configuration
+  - api-gateway
+
+home: https://chart.elchi.io
+sources:
+  - https://github.com/cloudnativeworks/elchi-helm
+maintainers:
+  - name: John Brown
+    email: admin@cloudnativeworks.com
+    url: https://cloudnativeworks.com
+
+annotations:
+  artifacthub.io/license: MIT
+  artifacthub.io/prerelease: "true"
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/valuesSchema: "true"
+
+dependencies:
+  - name: elchi-discovery-api
+    version: "0.1.0"
+    repository: "file://charts/elchi-discovery-api"
+  - name: envoy
+    version: "1.0.0" 
+    repository: "file://charts/envoy"
+  - name: redis
+    version: "0.1.0"
+    repository: "file://charts/redis"

@@ -1,0 +1,199 @@
+apiVersion: v1
+entries:
+  elchi-discovery:
+  - annotations:
+      artifacthub.io/containsSecurityUpdates: "false"
+      artifacthub.io/license: MIT
+      artifacthub.io/prerelease: "true"
+      artifacthub.io/valuesSchema: "true"
+    apiVersion: v2
+    appVersion: v0.1.0
+    created: "2025-08-08T21:18:17.55479063Z"
+    dependencies:
+    - name: elchi-discovery-api
+      repository: file://charts/elchi-discovery-api
+      version: 0.1.0
+    - name: envoy
+      repository: file://charts/envoy
+      version: 1.0.0
+    - name: redis
+      repository: file://charts/redis
+      version: 0.1.0
+    description: Service discovery and registry component for Elchi proxy management
+      platform
+    digest: b071959053feebacd7a649631a00c8d966348b9320467dba4444402ebb20bbd0
+    home: https://chart.elchi.io
+    icon: https://chart.elchi.io/logo.png
+    keywords:
+    - service-discovery
+    - registry
+    - envoy
+    - proxy
+    - configuration
+    - api-gateway
+    kubeVersion: '>=1.19.0-0'
+    maintainers:
+    - email: admin@cloudnativeworks.com
+      name: John Brown
+      url: https://cloudnativeworks.com
+    name: elchi-discovery
+    sources:
+    - https://github.com/cloudnativeworks/elchi-helm
+    type: application
+    urls:
+    - https://chart.elchi.io/elchi-discovery-1.0.4.tgz
+    version: 1.0.4
+  - annotations:
+      artifacthub.io/containsSecurityUpdates: "false"
+      artifacthub.io/license: MIT
+      artifacthub.io/prerelease: "false"
+      artifacthub.io/valuesSchema: "true"
+    apiVersion: v2
+    appVersion: 1.0.0
+    created: "2025-08-08T21:18:17.553815553Z"
+    description: A Helm chart for Elchi Discovery
+    digest: 769449af7fec9c0ab0ba01e3193ce8f5a13f2cd02d5b4a61fbf44df68eb77a02
+    home: https://github.com/CloudNativeWorks/elchi-helm
+    keywords:
+    - elchi
+    - kubernetes
+    - endpoint-discovery
+    - cloud-native
+    maintainers:
+    - email: support@cloudnativeworks.io
+      name: CloudNativeWorks
+    name: elchi-discovery
+    sources:
+    - https://github.com/CloudNativeWorks/elchi-helm
+    type: application
+    urls:
+    - https://chart.elchi.io/elchi-discovery-1.0.0.tgz
+    version: 1.0.0
+  elchi-stack:
+  - annotations:
+      artifacthub.io/containsSecurityUpdates: "false"
+      artifacthub.io/license: MIT
+      artifacthub.io/prerelease: "false"
+      artifacthub.io/readme: "true"
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/bitnami/mongodb
+          title: MongoDB (optional)
+      artifacthub.io/requirements: |
+        - Kubernetes 1.19+
+        - Helm 3.0.0+
+        - At least 2 CPU cores and 4GB RAM per node
+      artifacthub.io/valuesSchema: "true"
+    apiVersion: v2
+    appVersion: v0.1.0
+    created: "2025-08-08T21:18:17.560572588Z"
+    dependencies:
+    - name: elchi
+      repository: file://charts/elchi
+      version: 1.0.0
+    - name: elchi-backend
+      repository: file://charts/elchi-backend
+      version: 1.0.0
+    - name: envoy
+      repository: file://charts/envoy
+      version: 1.0.0
+    - name: mongodb
+      repository: file://charts/mongodb
+      version: 1.0.0
+    - name: otel
+      repository: file://charts/otel
+      version: 1.0.0
+    - name: victoriametrics
+      repository: file://charts/victoriametrics
+      version: 1.0.0
+    description: A comprehensive Helm chart for deploying Elchi proxy management platform
+      with UI, controller, control plane and registry components
+    digest: 248c2c7f2521335793128ecae3400e9defd82efef4f6a3afa61ae84462076e2d
+    home: https://chart.elchi.io
+    icon: https://chart.elchi.io/logo.png
+    keywords:
+    - proxy
+    - envoy
+    - management
+    - configuration
+    - service-mesh
+    - traffic-management
+    - control-plane
+    - ui
+    - api-gateway
+    kubeVersion: '>=1.19.0-0'
+    maintainers:
+    - email: admin@cloudnativeworks.com
+      name: John Brown
+      url: https://cloudnativeworks.com
+    name: elchi-stack
+    sources:
+    - https://github.com/cloudnativeworks/elchi-helm
+    - https://chart.elchi.io
+    type: application
+    urls:
+    - https://chart.elchi.io/elchi-stack-1.0.3.tgz
+    version: 1.0.3
+  - annotations:
+      artifacthub.io/containsSecurityUpdates: "false"
+      artifacthub.io/license: MIT
+      artifacthub.io/prerelease: "false"
+      artifacthub.io/readme: "true"
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/bitnami/mongodb
+          title: MongoDB (optional)
+      artifacthub.io/requirements: |
+        - Kubernetes 1.19+
+        - Helm 3.0.0+
+        - At least 2 CPU cores and 4GB RAM per node
+      artifacthub.io/valuesSchema: "true"
+    apiVersion: v2
+    appVersion: v0.1.0
+    created: "2025-08-08T21:18:17.557066692Z"
+    dependencies:
+    - name: elchi
+      repository: file://charts/elchi
+      version: 1.0.0
+    - name: elchi-backend
+      repository: file://charts/elchi-backend
+      version: 1.0.0
+    - name: envoy
+      repository: file://charts/envoy
+      version: 1.0.0
+    - name: mongodb
+      repository: file://charts/mongodb
+      version: 1.0.0
+    - name: otel
+      repository: file://charts/otel
+      version: 1.0.0
+    - name: victoriametrics
+      repository: file://charts/victoriametrics
+      version: 1.0.0
+    description: A comprehensive Helm chart for deploying Elchi proxy management platform
+      with UI, controller, control plane and registry components
+    digest: 61ff54157a20a73add1937b949aca6eba373247a808498f9136cb6e982a84ce3
+    home: https://chart.elchi.io
+    icon: https://chart.elchi.io/logo.png
+    keywords:
+    - proxy
+    - envoy
+    - management
+    - configuration
+    - service-mesh
+    - traffic-management
+    - control-plane
+    - ui
+    - api-gateway
+    kubeVersion: '>=1.19.0-0'
+    maintainers:
+    - email: admin@cloudnativeworks.com
+      name: John Brown
+      url: https://cloudnativeworks.com
+    name: elchi-stack
+    sources:
+    - https://github.com/cloudnativeworks/elchi-helm
+    - https://chart.elchi.io
+    type: application
+    urls:
+    - https://chart.elchi.io/elchi-stack-1.0.1.tgz
+    version: 1.0.1
+generated: "2025-08-08T21:18:17.55313782Z"

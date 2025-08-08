@@ -1,0 +1,12 @@
+dependencies:
+- name: elchi-discovery-api
+  repository: file://charts/elchi-discovery-api
+  version: 0.1.0
+- name: envoy
+  repository: file://charts/envoy
+  version: 1.0.0
+- name: redis
+  repository: file://charts/redis
+  version: 0.1.0
+digest: sha256:56b725ac065ad42857e455dc3ee225ffbad57ebc15590fa90a59a92fd0d93b61
+generated: "2025-08-07T19:45:00.090342921Z"
