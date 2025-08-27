@@ -1,0 +1,14 @@
+apiVersion: v2
+name: otel
+description: OpenTelemetry Collector for metrics processing and forwarding to VictoriaMetrics
+type: application
+version: 1.0.0
+appVersion: "0.89.0"
+keywords:
+  - observability
+  - metrics
+  - opentelemetry
+  - monitoring
+maintainers:
+  - name: John Brown
+    email: admin@cloudnativeworks.com 
