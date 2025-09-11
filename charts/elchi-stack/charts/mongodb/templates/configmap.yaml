@@ -1,0 +1,17 @@
+{{- if .Values.global.installMongo }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-init
+  namespace: {{ $.Values.global.namespace }}
+data:
+  init.js: |
+    db.createUser({
+      user: {{ .Values.global.mongodb.username | quote }},
+      pwd: {{ .Values.global.mongodb.password | quote }},
+      roles: [
+        { role: "readWrite", db: {{ .Values.global.mongodb.database | quote }} },
+        { role: "dbAdmin", db: {{ .Values.global.mongodb.database | quote }} }
+      ]
+    });
+{{- end }}
