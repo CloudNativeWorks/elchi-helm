@@ -1,0 +1,45 @@
+image:
+  repository: jhonbrownn/elchi-backend
+  pullPolicy: Always
+
+resources:
+  controller:
+    requests:
+      memory: "255Mi"
+      cpu: "150m"
+    limits:
+      memory: "512Mi"
+      cpu: "250m"
+  controlPlane:
+    requests:
+      memory: "256Mi"
+      cpu: "150m"
+    limits:
+      memory: "512Mi"
+      cpu: "250m"
+  registry:
+    requests:
+      memory: "256Mi"
+      cpu: "150m"
+    limits:
+      memory: "512Mi"
+      cpu: "250m"
+
+service:
+  type: ClusterIP
+  controller:
+    port: 8099
+    grpcPort: 50051
+  controlPlane:
+    port: 18000
+  registry:
+    port: 9090
+
+configMap:
+  name: elchi-backend-config
+
+config:
+  logging:
+    level: "info"
+    formatter: "text"
+    reportCaller: "false"

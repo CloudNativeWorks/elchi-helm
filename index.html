@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elchi Helm Repository</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f8fafc;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 1rem;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        .charts-grid {
+            display: grid;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .chart-item {
+            border: 1px solid #e5e7eb;
+            padding: 1rem;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="logo.png" alt="Elchi Logo" class="logo">
+        <h1>Elchi Helm Repository</h1>
+        <p>Official Helm charts for the Elchi proxy management platform</p>
+    </div>
+
+    <div class="card">
+        <h2>🚀 Quick Start</h2>
+        <h3>Add Repository</h3>
+        <pre>helm repo add elchi https://charts.elchi.io
+helm repo update</pre>
+        
+        <h3>Install Charts</h3>
+        <pre># Complete platform
+helm install my-stack elchi/elchi-stack --set global.mainAddress="your-domain.com"
+
+# Discovery service only  
+helm install my-discovery elchi/elchi-discovery</pre>
+    </div>
+
+    <div class="card">
+        <h2>📦 Available Charts</h2>
+        <div class="charts-grid">
+            <div class="chart-item">
+                <h3>elchi-stack <span class="badge">v1.0.0</span></h3>
+                <p>Complete proxy management platform with UI, controller, control plane and registry components</p>
+            </div>
+            <div class="chart-item">
+                <h3>elchi-discovery <span class="badge">v1.0.0</span></h3>
+                <p>Service discovery & registry component</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📖 Documentation</h2>
+        <ul>
+            <li><a href="https://github.com/cloudnativeworks/elchi-helm">GitHub Repository</a></li>
+            <li><a href="index.yaml">Repository Index (YAML)</a></li>
+            <li><a href="https://artifacthub.io/packages/search?repo=elchi">Artifact Hub</a></li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>📋 Requirements</h2>
+        <ul>
+            <li><strong>Kubernetes:</strong> 1.19+</li>
+            <li><strong>Helm:</strong> 3.0.0+</li>
+            <li><strong>Resources:</strong> 2+ CPU cores, 4GB+ RAM per node</li>
+        </ul>
+    </div>
+</body>
+</html>
