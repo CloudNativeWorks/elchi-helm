@@ -1,0 +1,15 @@
+apiVersion: v2
+name: elchi-backend
+description: Elchi Backend Services - Controller, Control Plane and Registry components
+type: application
+version: 1.0.0
+appVersion: "0.1.0"
+keywords:
+  - backend
+  - controller
+  - control-plane
+  - registry
+  - proxy-management
+maintainers:
+  - name: John Brown
+    email: admin@cloudnativeworks.com 

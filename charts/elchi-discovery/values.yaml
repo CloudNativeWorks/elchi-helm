@@ -1,0 +1,95 @@
+# Default values for elchi-endpoint-discovery
+replicaCount: 1
+
+image:
+  repository: jhonbrownn/elchi-discovery
+  pullPolicy: Always
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  name: ""
+
+# RBAC configuration
+rbac:
+  # Specifies whether RBAC resources should be created
+  create: true
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 65534
+  runAsNonRoot: true
+  runAsUser: 65534
+  runAsGroup: 65534
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 65534
+  runAsGroup: 65534
+  capabilities:
+    drop:
+    - ALL
+
+# Elchi configuration
+config:
+  # Elchi token for authentication
+  token: ""
+  # API endpoint to send discovery results
+  apiEndpoint: "https://<elchi-main-address>/api/discovery/k8s"
+  # Skip TLS certificate verification (use with caution)
+  insecureSkipVerify: true
+  # Log configuration
+  log:
+    level: "info"
+    format: "json"  # Use JSON format for production
+    output: "stdout"
+
+# Discovery interval in seconds
+discoveryInterval: 30
+
+# Cluster name (REQUIRED - must be set)
+clusterName: "x-cluster"
+
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Timezone configuration
+timezone: "Europe/Istanbul"
+timezonePath: "/etc/localtime"
+
+# Additional environment variables
+env: []
+# Example:
+# env:
+#   - name: MY_ENV_VAR
+#     value: "my_value"
+
+# Additional environment variables from ConfigMaps or Secrets
+envFrom: []
+# Example:
+# envFrom:
+#   - configMapRef:
+#       name: my-configmap
