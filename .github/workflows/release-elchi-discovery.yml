@@ -40,24 +40,11 @@ jobs:
       with:
         version: v3.16.3
 
-    - name: Check if chart version changed
-      id: version_check
-      run: |
-        CHART_VERSION=$(grep '^version:' charts/elchi-discovery/Chart.yaml | cut -d' ' -f2)
-        if git show HEAD~1:charts/elchi-discovery/Chart.yaml 2>/dev/null | grep -q "^version: $CHART_VERSION"; then
-          echo "version_changed=false" >> $GITHUB_OUTPUT
-        else
-          echo "version_changed=true" >> $GITHUB_OUTPUT
-          echo "chart_version=$CHART_VERSION" >> $GITHUB_OUTPUT
-        fi
-
     - name: Lint chart
-      if: steps.version_check.outputs.version_changed == 'true'
       run: |
         helm lint charts/elchi-discovery --strict
 
     - name: Validate values schema
-      if: steps.version_check.outputs.version_changed == 'true'
       run: |
         if [ -f charts/elchi-discovery/values.schema.json ]; then
           echo "Values schema found, validation will be done by Helm"
@@ -68,7 +55,6 @@ jobs:
         fi
 
     - name: Test chart installation
-      if: steps.version_check.outputs.version_changed == 'true'
       run: |
         # Test with required values
         helm template test-release charts/elchi-discovery \
@@ -78,13 +64,11 @@ jobs:
         echo "✓ Chart templates render successfully"
 
     - name: Package chart
-      if: steps.version_check.outputs.version_changed == 'true'
       run: |
         helm dependency update charts/elchi-discovery
         helm package charts/elchi-discovery --destination .deploy
 
     - name: Prepare deployment directory
-      if: steps.version_check.outputs.version_changed == 'true'
       run: |
         mkdir -p .gh-pages
         # Copy existing static files if they exist
@@ -93,14 +77,12 @@ jobs:
         cp index.html .gh-pages/ 2>/dev/null || echo "No index.html file found"
 
     - name: Wait to avoid race conditions
-      if: steps.version_check.outputs.version_changed == 'true'
       run: |
         # Add a longer delay to ensure elchi-stack deploys first if both are triggered
         echo "Waiting before deployment to avoid race conditions..."
         sleep 30
         
     - name: Download existing index.yaml
-      if: steps.version_check.outputs.version_changed == 'true'
       run: |
         # Try to download existing index.yaml from GitHub Pages with retry
         for i in {1..3}; do
@@ -118,7 +100,6 @@ jobs:
         done
         
     - name: Download existing chart packages
-      if: steps.version_check.outputs.version_changed == 'true'
       run: |
         # Download all existing .tgz files if index.yaml exists
         if [ -f .gh-pages/index.yaml ]; then
@@ -150,7 +131,6 @@ jobs:
         fi
 
     - name: Update Helm repository
-      if: steps.version_check.outputs.version_changed == 'true'
       run: |
         cp .deploy/*.tgz .gh-pages/
         cp artifacthub-repo.yml .gh-pages/ 2>/dev/null || true
@@ -163,16 +143,13 @@ jobs:
         helm repo index .gh-pages --url https://charts.elchi.io
         
     - name: Setup Pages
-      if: steps.version_check.outputs.version_changed == 'true'
       uses: actions/configure-pages@v4
-      
+
     - name: Upload artifact
-      if: steps.version_check.outputs.version_changed == 'true'
       uses: actions/upload-pages-artifact@v3
       with:
         path: .gh-pages
-        
+
     - name: Deploy to GitHub Pages
-      if: steps.version_check.outputs.version_changed == 'true'
       id: deployment
       uses: actions/deploy-pages@v4
