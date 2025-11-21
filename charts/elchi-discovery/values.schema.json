@@ -35,8 +35,8 @@
       "properties": {
         "token": {
           "type": "string",
-          "description": "Elchi authentication token",
-          "minLength": 1
+          "description": "Elchi authentication token (must be provided during deployment)",
+          "default": ""
         },
         "apiEndpoint": {
           "type": "string",
@@ -71,7 +71,7 @@
           }
         }
       },
-      "required": ["token", "apiEndpoint"]
+      "required": ["apiEndpoint"]
     },
     "discoveryInterval": {
       "type": "integer",
