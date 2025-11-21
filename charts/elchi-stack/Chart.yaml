@@ -1,0 +1,64 @@
+apiVersion: v2
+name: elchi-stack
+description: A comprehensive Helm chart for deploying Elchi proxy management platform with UI, controller, control plane and registry components
+type: application
+version: 1.0.0
+appVersion: "v0.1.0"
+kubeVersion: ">=1.19.0-0"
+icon: "https://charts.elchi.io/logo.png"
+keywords:
+  - proxy
+  - envoy
+  - management
+  - configuration
+  - service-mesh
+  - traffic-management
+  - control-plane
+  - ui
+  - api-gateway
+
+home: https://charts.elchi.io
+sources:
+  - https://github.com/cloudnativeworks/elchi-helm
+  - https://charts.elchi.io
+maintainers:
+  - name: John Brown
+    email: admin@cloudnativeworks.com
+    url: https://cloudnativeworks.com
+
+annotations:
+  artifacthub.io/license: MIT
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/valuesSchema: "true"
+  artifacthub.io/readme: "true"
+  artifacthub.io/recommendations: |
+    - url: https://artifacthub.io/packages/helm/bitnami/mongodb
+      title: MongoDB (optional)
+  artifacthub.io/requirements: |
+    - Kubernetes 1.19+
+    - Helm 3.0.0+
+    - At least 2 CPU cores and 4GB RAM per node
+
+dependencies:
+  - name: elchi
+    version: "1.0.0"
+    repository: "file://charts/elchi"
+  - name: elchi-backend
+    version: "1.0.0"
+    repository: "file://charts/elchi-backend"
+  - name: envoy
+    version: "1.0.0"
+    repository: "file://charts/envoy"
+  - name: mongodb
+    version: "1.0.0"
+    repository: "file://charts/mongodb"
+  - name: otel
+    version: "1.0.0"
+    repository: "file://charts/otel"
+  - name: victoriametrics
+    version: "1.0.0"
+    repository: "file://charts/victoriametrics"
+  - name: grafana
+    version: "1.0.0"
+    repository: "file://charts/grafana"

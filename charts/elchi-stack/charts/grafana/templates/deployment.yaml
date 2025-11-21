@@ -1,0 +1,114 @@
+{{- if not .Values.global.grafana }}
+{{- fail "global.grafana configuration is required" }}
+{{- end }}
+{{- if not .Values.global.grafana.user }}
+{{- fail "global.grafana.user is required" }}
+{{- end }}
+{{- if not .Values.global.grafana.password }}
+{{- fail "global.grafana.password is required" }}
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      securityContext:
+        fsGroup: 472
+        runAsUser: 472
+        runAsNonRoot: true
+      containers:
+      - name: grafana
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        env:
+        - name: GF_SECURITY_ADMIN_USER
+          value: {{ .Values.global.grafana.user | quote }}
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: {{ .Values.global.grafana.password | quote }}
+        - name: GF_USERS_DEFAULT_THEME
+          value: "dark"
+        - name: GF_SERVER_ROOT_URL
+          value: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
+        - name: GF_SERVER_SERVE_FROM_SUB_PATH
+          value: "true"
+        - name: GF_AUTH_ANONYMOUS_ENABLED
+          value: "false"
+        - name: GF_LOG_LEVEL
+          value: "info"
+        - name: GF_FEATURE_TOGGLES_ENABLE
+          value: ""
+        - name: GF_INSTALL_PLUGINS
+          value: ""
+        - name: GF_PLUGINS_CATALOG_HIDDEN_PLUGINS
+          value: "*"
+        - name: GF_PLUGIN_ADMIN_ENABLED
+          value: "false"
+        - name: GF_PLUGINS_PLUGIN_ADMIN_ENABLED
+          value: "false"
+        - name: GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS
+          value: ""
+        - name: GF_GNET_URL
+          value: ""
+        - name: GF_AUTH_DISABLE_LOGIN_FORM
+          value: "false"
+        - name: GF_AUTH_DISABLE_SIGNOUT_MENU
+          value: "false"
+        {{- if .Values.global.timezone }}
+        - name: TZ
+          value: {{ .Values.global.timezone | quote }}
+        {{- else }}
+        - name: TZ
+          value: "UTC"
+        {{- end }}
+        volumeMounts:
+        - name: grafana-storage
+          mountPath: /var/lib/grafana
+        - name: grafana-datasources
+          mountPath: /etc/grafana/provisioning/datasources
+        - name: grafana-dashboards-config
+          mountPath: /etc/grafana/provisioning/dashboards
+        - name: grafana-dashboards
+          mountPath: /etc/grafana/dashboards
+        - name: localtime
+          mountPath: /etc/localtime
+          readOnly: true
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+      volumes:
+      - name: grafana-storage
+        emptyDir:
+          medium: Memory
+          sizeLimit: 512Mi
+      - name: grafana-datasources
+        configMap:
+          name: grafana-datasources
+      - name: grafana-dashboards-config
+        configMap:
+          name: grafana-dashboards-config
+      - name: grafana-dashboards
+        configMap:
+          name: grafana-dashboards
+      - name: localtime
+        hostPath:
+          {{- if .Values.global.timezonePath }}
+          path: {{ .Values.global.timezonePath }}
+          {{- else }}
+          path: /etc/localtime
+          {{- end }}
+          type: File

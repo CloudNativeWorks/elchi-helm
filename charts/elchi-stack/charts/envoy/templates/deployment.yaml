@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: envoy
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: envoy
+  template:
+    metadata:
+      labels:
+        app: envoy
+    spec:
+      containers:
+        - name: envoy
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: TZ
+              value: {{ $.Values.global.timezone | default "UTC" | quote }}
+          command: ["/usr/local/bin/envoy"]
+          args:
+            - -l debug
+            - -c
+            - /etc/envoy/envoy.yaml
+          ports:
+            - containerPort: 1989
+              name: http
+            - containerPort: 9901
+              name: admin
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: envoy-config
+              mountPath: /etc/envoy
+            - name: timezone
+              mountPath: /etc/localtime
+              readOnly: true
+      volumes:
+        - name: envoy-config
+          configMap:
+            name: envoy-config
+        - name: timezone
+          hostPath:
+            path: {{ $.Values.global.timezonePath | default "/etc/localtime" }}

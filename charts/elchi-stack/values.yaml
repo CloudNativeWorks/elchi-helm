@@ -1,0 +1,45 @@
+global:
+  clusterDomain: "cluster.local"
+  mainAddress: "" # Required
+  port: ""  # If empty, will use 80 for HTTP or 443 for HTTPS based on tlsEnabled
+  tlsEnabled: false
+  enableDemo: false
+  smtppass: ""
+  timezone: ""  # If empty, will use host timezone. Examples: "Europe/Istanbul", "UTC", "America/New_York"
+  versions:
+    - tag: v0.1.0-v0.13.4-envoy1.36.2
+  installMongo: true
+  installVictoriaMetrics: true
+  internalCommunication: false
+  mongodb:
+    hosts: ""
+    username: "elchi"
+    password: "elchi"
+    database: "elchi"
+    scheme: ""
+    port: ""
+    replicaset: ""
+    timeoutMs: ""
+    tlsEnabled: ""
+    authSource: ""
+    authMechanism: ""
+  jwt:
+    secret: "xK9mP2sV8nQ4wT6yR3jL5bH7fA0cE1gD9kU2oI6vN8xM4qZ" # important! change this value
+    accessTokenDuration: "1h"
+    refreshTokenDuration: "5h"
+  cors:
+    allowedOrigins: "*"  # Allow all origins, change to specific domains for production
+  victoriametrics:
+    endpoint: "" # Required when installVictoriaMetrics is false (e.g., "http://external-vm.example.com:8428")
+  grafana:
+    user: "elchi"
+    password: "elchi"
+  elchiBackend:
+    controlPlaneDefaultReplicas: 4
+    controllerDefaultReplicas: 4
+  envoy:
+    service:
+      type: NodePort        # Options: ClusterIP, NodePort, LoadBalancer
+      httpNodePort: null    # Optional: Set a fixed port (e.g., 30080), or leave null for auto-assign
+      adminNodePort: null   # Optional: Set a fixed port (e.g., 30901), or leave null for auto-assign
+      annotations: {}       # Cloud provider specific annotations (e.g., AWS NLB, GCP internal LB)

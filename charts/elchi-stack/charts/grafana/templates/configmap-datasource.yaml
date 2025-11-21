@@ -1,0 +1,33 @@
+{{- if not .Values.global.victoriametrics }}
+{{- fail "global.victoriametrics configuration is required for Grafana datasource" }}
+{{- end }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: {{ .Release.Namespace }}
+data:
+  datasources.yml: |
+    apiVersion: 1
+    datasources:
+    - name: {{ .Values.datasource.name }}
+      uid: victoriametrics
+      type: {{ .Values.datasource.type }}
+      access: {{ .Values.datasource.access }}
+      {{- if .Values.global.installVictoriaMetrics }}
+      url: http://victoriametrics.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:8428
+      {{- else }}
+      {{- if not .Values.global.victoriametrics.endpoint }}
+      {{- fail "When installVictoriaMetrics is false, global.victoriametrics.endpoint must be provided" }}
+      {{- end }}
+      {{- if contains "://" .Values.global.victoriametrics.endpoint }}
+      url: {{ .Values.global.victoriametrics.endpoint }}
+      {{- else }}
+      url: http://{{ .Values.global.victoriametrics.endpoint }}
+      {{- end }}
+      {{- end }}
+      isDefault: {{ .Values.datasource.isDefault }}
+      editable: true
+      jsonData:
+        timeInterval: "30s"
+        httpMethod: POST
