@@ -56,7 +56,6 @@ helm install my-discovery charts/elchi-discovery/
 
 - **Issues**: [GitHub Issues](https://github.com/cloudnativeworks/elchi-helm/issues)
 - **Documentation**: [Official Docs](https://charts.elchi.io)
-- **Community**: [Discussions](https://github.com/cloudnativeworks/elchi-helm/discussions)
 
 ## 📜 License
 
