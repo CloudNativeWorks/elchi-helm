@@ -12,8 +12,8 @@
                 },
                 "mainAddress": {
                     "type": "string",
-                    "description": "Base URL for the all components",
-                    "minLength": 1
+                    "description": "Base URL for the all components (must be provided during deployment)",
+                    "default": ""
                 },
                 "port": {
                     "type": "string",
