@@ -35,7 +35,7 @@ data:
                 connection_keepalive:
                   interval: 30s
                   timeout: 10s
-              stream_idle_timeout: 0s
+              stream_idle_timeout: 90s
               request_timeout: 0s
               stat_prefix: ingress_http
               codec_type: AUTO

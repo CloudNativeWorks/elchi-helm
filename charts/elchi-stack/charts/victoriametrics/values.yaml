@@ -18,6 +18,6 @@ resources:
 persistence:
   enabled: true
   size: "5Gi"
-  storageClass: standard
+  storageClass: local-path
 
 retentionPeriod: "30d"
