@@ -1,0 +1,28 @@
+image:
+  repository: grafana/grafana
+  tag: 12.2.0
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3000
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "200m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+
+# Admin credentials
+user: admin
+password: admin
+
+# VictoriaMetrics datasource configuration
+# Will use internal or external based on global.installVictoriaMetrics
+datasource:
+  name: VictoriaMetrics
+  type: prometheus
+  access: proxy
+  isDefault: true

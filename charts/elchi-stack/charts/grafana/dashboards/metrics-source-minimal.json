@@ -1,0 +1,526 @@
+{
+  "dashboard_info": {
+    "title": "Elchi Metrics",
+    "uid": "elchi-minimal",
+    "tags": [
+      "elchi",
+      "proxy",
+      "essential",
+      "minimal"
+    ],
+    "refresh": "10s"
+  },
+  "datasource": {
+    "type": "prometheus",
+    "uid": "victoriametrics"
+  },
+  "metrics": [
+    {
+      "row_title": "Health & Status",
+      "is_collapsed": false,
+      "panels": [
+        {
+          "title": "Server Status",
+          "description": "Server live status (1 = live, 0 = draining)",
+          "metric_names": [
+            "server_live"
+          ],
+          "unit": "short",
+          "panel_type": "stat",
+          "width": 5,
+          "queries": [
+            {
+              "metric": "server_live",
+              "legend": "Status",
+              "type": "gauge",
+              "group_by": ""
+            }
+          ]
+        },
+        {
+          "title": "Uptime",
+          "description": "Server uptime in seconds",
+          "metric_names": [
+            "server_uptime"
+          ],
+          "unit": "s",
+          "panel_type": "timeseries",
+          "width": 5,
+          "queries": [
+            {
+              "metric": "server_uptime",
+              "legend": "Uptime",
+              "type": "gauge",
+              "group_by": ""
+            }
+          ]
+        },
+        {
+          "title": "Concurrency",
+          "description": "Number of worker threads",
+          "metric_names": [
+            "server_concurrency"
+          ],
+          "unit": "short",
+          "panel_type": "timeseries",
+          "width": 5,
+          "queries": [
+            {
+              "metric": "server_concurrency",
+              "legend": "Threads",
+              "type": "gauge",
+              "group_by": ""
+            }
+          ]
+        },
+        {
+          "title": "Memory Allocated",
+          "description": "Total memory allocated by Envoy",
+          "metric_names": [
+            "server_memory_allocated"
+          ],
+          "unit": "bytes",
+          "panel_type": "timeseries",
+          "width": 5,
+          "queries": [
+            {
+              "metric": "server_memory_allocated",
+              "legend": "Allocated",
+              "type": "gauge",
+              "group_by": ""
+            }
+          ]
+        },
+        {
+          "title": "Heap Size",
+          "description": "Current heap size",
+          "metric_names": [
+            "server_memory_heap_size"
+          ],
+          "unit": "bytes",
+          "panel_type": "timeseries",
+          "width": 4,
+          "queries": [
+            {
+              "metric": "server_memory_heap_size",
+              "legend": "Heap",
+              "type": "gauge",
+              "group_by": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_title": "Cluster Health",
+      "is_collapsed": false,
+      "panels": [
+        {
+          "title": "Active Clusters",
+          "description": "Total number of active upstream clusters",
+          "metric_names": [
+            "cluster_manager_active_clusters"
+          ],
+          "unit": "short",
+          "panel_type": "timeseries",
+          "width": 6,
+          "queries": [
+            {
+              "metric": "cluster_manager_active_clusters",
+              "legend": "Clusters",
+              "type": "gauge",
+              "group_by": ""
+            }
+          ]
+        },
+        {
+          "title": "Total Members",
+          "description": "Total upstream members across all clusters",
+          "metric_names": [
+            "cluster_membership_total"
+          ],
+          "unit": "short",
+          "panel_type": "timeseries",
+          "width": 6,
+          "queries": [
+            {
+              "metric": "cluster_membership_total",
+              "legend": "Total",
+              "type": "gauge",
+              "group_by": "",
+              "exclude_cluster": "elchi-control-plane"
+            }
+          ]
+        },
+        {
+          "title": "Healthy Members",
+          "description": "Healthy upstream members across all clusters",
+          "metric_names": [
+            "cluster_membership_healthy"
+          ],
+          "unit": "short",
+          "panel_type": "timeseries",
+          "width": 6,
+          "queries": [
+            {
+              "metric": "cluster_membership_healthy",
+              "legend": "Healthy",
+              "type": "gauge",
+              "group_by": "",
+              "exclude_cluster": "elchi-control-plane"
+            }
+          ]
+        },
+        {
+          "title": "Degraded Members",
+          "description": "Degraded upstream members",
+          "metric_names": [
+            "cluster_membership_degraded"
+          ],
+          "unit": "short",
+          "panel_type": "timeseries",
+          "width": 6,
+          "queries": [
+            {
+              "metric": "cluster_membership_degraded",
+              "legend": "Degraded",
+              "type": "gauge",
+              "group_by": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_title": "Downstream - Client to Envoy",
+      "is_collapsed": false,
+      "panels": [
+        {
+          "title": "Active Connections",
+          "description": "Active downstream connections from clients",
+          "metric_names": [
+            "http_downstream_cx_active"
+          ],
+          "unit": "short",
+          "panel_type": "timeseries",
+          "width": 8,
+          "queries": [
+            {
+              "metric": "http_downstream_cx_active",
+              "legend": "{{envoy_http_conn_manager_prefix}}",
+              "type": "gauge",
+              "group_by": "envoy_http_conn_manager_prefix"
+            }
+          ]
+        },
+        {
+          "title": "Request Rate",
+          "description": "Downstream requests per second",
+          "metric_names": [
+            "http_downstream_rq_total"
+          ],
+          "unit": "reqps",
+          "panel_type": "timeseries",
+          "width": 8,
+          "queries": [
+            {
+              "metric": "http_downstream_rq_total",
+              "legend": "{{envoy_http_conn_manager_prefix}}",
+              "type": "rate",
+              "group_by": "envoy_http_conn_manager_prefix"
+            }
+          ]
+        },
+        {
+          "title": "Active Requests",
+          "description": "Currently active downstream requests",
+          "metric_names": [
+            "http_downstream_rq_active"
+          ],
+          "unit": "short",
+          "panel_type": "timeseries",
+          "width": 8,
+          "queries": [
+            {
+              "metric": "http_downstream_rq_active",
+              "legend": "{{envoy_http_conn_manager_prefix}}",
+              "type": "gauge",
+              "group_by": "envoy_http_conn_manager_prefix"
+            }
+          ]
+        },
+        {
+          "title": "Response Time (p95)",
+          "description": "95th percentile response time",
+          "metric_names": [
+            "http_downstream_rq_time_bucket"
+          ],
+          "unit": "ms",
+          "panel_type": "timeseries",
+          "width": 8,
+          "queries": [
+            {
+              "metric": "http_downstream_rq_time_bucket",
+              "legend": "{{envoy_http_conn_manager_prefix}}",
+              "type": "histogram",
+              "group_by": "envoy_http_conn_manager_prefix",
+              "quantile": 0.95
+            }
+          ]
+        },
+        {
+          "title": "Response Time (p99)",
+          "description": "99th percentile response time",
+          "metric_names": [
+            "http_downstream_rq_time_bucket"
+          ],
+          "unit": "ms",
+          "panel_type": "timeseries",
+          "width": 8,
+          "queries": [
+            {
+              "metric": "http_downstream_rq_time_bucket",
+              "legend": "{{envoy_http_conn_manager_prefix}}",
+              "type": "histogram",
+              "group_by": "envoy_http_conn_manager_prefix",
+              "quantile": 0.99
+            }
+          ]
+        },
+        {
+          "title": "2xx Responses",
+          "description": "Successful responses per second",
+          "metric_names": [
+            "http_downstream_rq_2xx_total"
+          ],
+          "unit": "reqps",
+          "panel_type": "timeseries",
+          "width": 8,
+          "queries": [
+            {
+              "metric": "http_downstream_rq_2xx_total",
+              "legend": "{{envoy_http_conn_manager_prefix}}",
+              "type": "rate",
+              "group_by": "envoy_http_conn_manager_prefix"
+            }
+          ]
+        },
+        {
+          "title": "4xx Responses",
+          "description": "Client error responses per second",
+          "metric_names": [
+            "http_downstream_rq_4xx_total"
+          ],
+          "unit": "reqps",
+          "panel_type": "timeseries",
+          "width": 8,
+          "queries": [
+            {
+              "metric": "http_downstream_rq_4xx_total",
+              "legend": "{{envoy_http_conn_manager_prefix}}",
+              "type": "rate",
+              "group_by": "envoy_http_conn_manager_prefix"
+            }
+          ]
+        },
+        {
+          "title": "5xx Responses",
+          "description": "Server error responses per second",
+          "metric_names": [
+            "http_downstream_rq_5xx_total"
+          ],
+          "unit": "reqps",
+          "panel_type": "timeseries",
+          "width": 8,
+          "queries": [
+            {
+              "metric": "http_downstream_rq_5xx_total",
+              "legend": "{{envoy_http_conn_manager_prefix}}",
+              "type": "rate",
+              "group_by": "envoy_http_conn_manager_prefix"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_title": "Upstream - Envoy to Backend",
+      "is_collapsed": false,
+      "panels": [
+        {
+          "title": "Active Connections",
+          "description": "Active upstream connections to backends",
+          "metric_names": [
+            "cluster_upstream_cx_active"
+          ],
+          "unit": "short",
+          "panel_type": "timeseries",
+          "width": 8,
+          "queries": [
+            {
+              "metric": "cluster_upstream_cx_active",
+              "legend": "{{envoy_cluster_name}}",
+              "type": "gauge",
+              "group_by": "envoy_cluster_name",
+              "exclude_cluster": "elchi-control-plane"
+            }
+          ]
+        },
+        {
+          "title": "Request Rate",
+          "description": "Upstream requests per second",
+          "metric_names": [
+            "cluster_upstream_rq_total"
+          ],
+          "unit": "reqps",
+          "panel_type": "timeseries",
+          "width": 8,
+          "queries": [
+            {
+              "metric": "cluster_upstream_rq_total",
+              "legend": "{{envoy_cluster_name}}",
+              "type": "rate",
+              "group_by": "envoy_cluster_name",
+              "exclude_cluster": "elchi-control-plane"
+            }
+          ]
+        },
+        {
+          "title": "Active Requests",
+          "description": "Currently active upstream requests",
+          "metric_names": [
+            "cluster_upstream_rq_active"
+          ],
+          "unit": "short",
+          "panel_type": "timeseries",
+          "width": 8,
+          "queries": [
+            {
+              "metric": "cluster_upstream_rq_active",
+              "legend": "{{envoy_cluster_name}}",
+              "type": "gauge",
+              "group_by": "envoy_cluster_name",
+              "exclude_cluster": "elchi-control-plane"
+            }
+          ]
+        },
+        {
+          "title": "Request Timeouts",
+          "description": "Upstream request timeouts per second",
+          "metric_names": [
+            "cluster_upstream_rq_timeout_total"
+          ],
+          "unit": "reqps",
+          "panel_type": "timeseries",
+          "width": 12,
+          "queries": [
+            {
+              "metric": "cluster_upstream_rq_timeout_total",
+              "legend": "{{envoy_cluster_name}}",
+              "type": "rate",
+              "group_by": "envoy_cluster_name",
+              "exclude_cluster": "elchi-control-plane"
+            }
+          ]
+        },
+        {
+          "title": "Request Retries",
+          "description": "Upstream request retries per second",
+          "metric_names": [
+            "cluster_upstream_rq_retry_total"
+          ],
+          "unit": "reqps",
+          "panel_type": "timeseries",
+          "width": 12,
+          "queries": [
+            {
+              "metric": "cluster_upstream_rq_retry_total",
+              "legend": "{{envoy_cluster_name}}",
+              "type": "rate",
+              "group_by": "envoy_cluster_name",
+              "exclude_cluster": "elchi-control-plane"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row_title": "Circuit Breakers & Resilience",
+      "is_collapsed": false,
+      "panels": [
+        {
+          "title": "Ejected Hosts",
+          "description": "Hosts ejected by outlier detection",
+          "metric_names": [
+            "cluster_ejections_active"
+          ],
+          "unit": "short",
+          "panel_type": "timeseries",
+          "width": 6,
+          "queries": [
+            {
+              "metric": "cluster_ejections_active",
+              "legend": "{{envoy_cluster_name}}",
+              "type": "gauge",
+              "group_by": "envoy_cluster_name"
+            }
+          ]
+        },
+        {
+          "title": "Connection Circuit Breaker Opens",
+          "description": "Connection circuit breaker opens per second",
+          "metric_names": [
+            "cluster_circuit_breakers_default_cx_open_total"
+          ],
+          "unit": "ops",
+          "panel_type": "timeseries",
+          "width": 6,
+          "queries": [
+            {
+              "metric": "cluster_circuit_breakers_default_cx_open_total",
+              "legend": "{{envoy_cluster_name}}",
+              "type": "rate",
+              "group_by": "envoy_cluster_name"
+            }
+          ]
+        },
+        {
+          "title": "Request Circuit Breaker Opens",
+          "description": "Request circuit breaker opens per second",
+          "metric_names": [
+            "cluster_circuit_breakers_default_rq_open_total"
+          ],
+          "unit": "ops",
+          "panel_type": "timeseries",
+          "width": 6,
+          "queries": [
+            {
+              "metric": "cluster_circuit_breakers_default_rq_open_total",
+              "legend": "{{envoy_cluster_name}}",
+              "type": "rate",
+              "group_by": "envoy_cluster_name"
+            }
+          ]
+        },
+        {
+          "title": "Connection Pool Overflow",
+          "description": "Connection pool overflow events per second",
+          "metric_names": [
+            "cluster_upstream_cx_overflow_total"
+          ],
+          "unit": "ops",
+          "panel_type": "timeseries",
+          "width": 6,
+          "queries": [
+            {
+              "metric": "cluster_upstream_cx_overflow_total",
+              "legend": "{{envoy_cluster_name}}",
+              "type": "rate",
+              "group_by": "envoy_cluster_name"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

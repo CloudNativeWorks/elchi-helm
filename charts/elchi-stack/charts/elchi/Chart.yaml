@@ -1,0 +1,14 @@
+apiVersion: v2
+name: elchi
+description: Elchi Frontend UI - Web interface for proxy configuration management
+type: application
+version: 1.0.0
+appVersion: "0.1.0"
+keywords:
+  - frontend
+  - ui
+  - proxy-management
+  - elchi
+maintainers:
+  - name: John Brown
+    email: admin@cloudnativeworks.com

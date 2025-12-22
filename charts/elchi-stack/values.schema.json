@@ -1,0 +1,254 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "global": {
+            "type": "object",
+            "properties": {
+                "clusterDomain": {
+                    "type": "string",
+                    "description": "Kubernetes cluster domain suffix",
+                    "default": "cluster.local"
+                },
+                "mainAddress": {
+                    "type": "string",
+                    "description": "Base URL for the all components (must be provided during deployment)",
+                    "default": ""
+                },
+                "port": {
+                    "type": "string",
+                    "description": "Port for the Elchi API. If empty, uses 80/443 based on TLS",
+                    "default": ""
+                },
+                "tlsEnabled": {
+                    "type": "boolean",
+                    "description": "Whether to use HTTPS",
+                    "default": false
+                },
+                "installMongo": {
+                    "type": "boolean",
+                    "description": "Whether to use self-hosted MongoDB",
+                    "default": true
+                },
+                "installVictoriaMetrics": {
+                    "type": "boolean",
+                    "description": "Whether to use self-hosted VictoriaMetrics",
+                    "default": true
+                },
+                "timezone": {
+                    "type": "string",
+                    "description": "Timezone configuration. If empty, will use host timezone",
+                    "default": "UTC"
+                },
+                "internalCommunication": {
+                    "type": "boolean",
+                    "description": "Whether to use internal communication",
+                    "default": false
+                },
+                "versions": {
+                    "type": "array",
+                    "description": "List of Elchi versions to deploy",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "tag": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "tag"
+                        ]
+                    },
+                    "default": [
+                        {
+                            "tag": "v0.1.0-v0.13.4-envoy1.36.2"
+                        }
+                    ]
+                },
+                "mongodb": {
+                    "type": "object",
+                    "properties": {
+                        "hosts": {
+                            "type": "string",
+                            "description": "MongoDB connection hosts (comma-separated for replica set)",
+                            "default": ""
+                        },
+                        "username": {
+                            "type": "string",
+                            "description": "MongoDB username",
+                            "default": "elchi"
+                        },
+                        "password": {
+                            "type": "string",
+                            "description": "MongoDB password",
+                            "default": "elchi"
+                        },
+                        "database": {
+                            "type": "string",
+                            "description": "MongoDB database name",
+                            "default": "elchi"
+                        },
+                        "scheme": {
+                            "type": "string",
+                            "description": "MongoDB connection scheme (mongodb or mongodb+srv)",
+                            "default": ""
+                        },
+                        "port": {
+                            "type": "string",
+                            "description": "MongoDB port",
+                            "default": ""
+                        },
+                        "replicaset": {
+                            "type": "string",
+                            "description": "MongoDB replicaset",
+                            "default": ""
+                        },
+                        "timeoutMs": {
+                            "type": "string",
+                            "description": "MongoDB timeout in milliseconds",
+                            "default": ""
+                        },
+                        "tlsEnabled": {
+                            "type": "string",
+                            "description": "Whether to use TLS for MongoDB",
+                            "default": ""
+                        },
+                        "authSource": {
+                            "type": "string",
+                            "description": "MongoDB authentication source database",
+                            "default": ""
+                        },
+                        "authMechanism": {
+                            "type": "string",
+                            "description": "MongoDB authentication mechanism",
+                            "default": ""
+                        }
+                    }
+                },
+                "victoriametrics": {
+                    "type": "object",
+                    "properties": {
+                        "endpoint": {
+                            "type": "string",
+                            "description": "External VictoriaMetrics endpoint (required when installVictoriaMetrics is false)",
+                            "default": ""
+                        }
+                    }
+                },
+                "grafana": {
+                    "type": "object",
+                    "properties": {
+                        "adminUser": {
+                            "type": "string",
+                            "description": "Grafana admin username",
+                            "default": "admin"
+                        },
+                        "adminPassword": {
+                            "type": "string",
+                            "description": "Grafana admin password",
+                            "default": "admin"
+                        }
+                    }
+                },
+                "jwt": {
+                    "type": "object",
+                    "properties": {
+                        "secret": {
+                            "type": "string",
+                            "description": "JWT secret key for authentication (minimum 32 characters)",
+                            "minLength": 32,
+                            "default": "xK9mP2sV8nQ4wT6yR3jL5bH7fA0cE1gD9kU2oI6vN8xM4qZ"
+                        },
+                        "accessTokenDuration": {
+                            "type": "string",
+                            "description": "Access token expiration duration",
+                            "default": "1h"
+                        },
+                        "refreshTokenDuration": {
+                            "type": "string",
+                            "description": "Refresh token expiration duration",
+                            "default": "5h"
+                        }
+                    },
+                    "required": ["secret"]
+                },
+                "cors": {
+                    "type": "object",
+                    "properties": {
+                        "allowedOrigins": {
+                            "type": "string",
+                            "description": "CORS allowed origins (use '*' for all origins, or comma-separated domains)",
+                            "default": "*"
+                        }
+                    }
+                },
+                "elchiBackend": {
+                    "type": "object",
+                    "properties": {
+                        "controlPlaneDefaultReplicas": {
+                            "type": "integer",
+                            "description": "Default number of replicas for Control Plane services",
+                            "default": 2
+                        },
+                        "controllerDefaultReplicas": {
+                            "type": "integer",
+                            "description": "Default number of replicas for Controller services",
+                            "default": 2
+                        }
+                    }
+                },
+                "envoy": {
+                    "type": "object",
+                    "description": "Envoy proxy service configuration",
+                    "properties": {
+                        "service": {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "description": "Kubernetes service type for Envoy",
+                                    "enum": ["ClusterIP", "NodePort", "LoadBalancer"],
+                                    "default": "NodePort"
+                                },
+                                "httpNodePort": {
+                                    "oneOf": [
+                                        {
+                                            "type": "integer",
+                                            "minimum": 30000,
+                                            "maximum": 32767,
+                                            "description": "Fixed NodePort for HTTP traffic (30000-32767)"
+                                        },
+                                        {
+                                            "type": "null"
+                                        }
+                                    ],
+                                    "default": null
+                                },
+                                "adminNodePort": {
+                                    "oneOf": [
+                                        {
+                                            "type": "integer",
+                                            "minimum": 30000,
+                                            "maximum": 32767,
+                                            "description": "Fixed NodePort for admin interface (30000-32767)"
+                                        },
+                                        {
+                                            "type": "null"
+                                        }
+                                    ],
+                                    "default": null
+                                },
+                                "annotations": {
+                                    "type": "object",
+                                    "description": "Service annotations for cloud provider configurations",
+                                    "default": {}
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "required": ["mainAddress"]
+        }
+    }
+}

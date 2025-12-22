@@ -1,0 +1,14 @@
+apiVersion: v2
+name: mongodb
+description: MongoDB database for storing Elchi proxy configurations
+type: application
+version: 1.0.0
+appVersion: "6.0"
+keywords:
+  - database
+  - mongodb
+  - storage
+  - configuration
+maintainers:
+  - name: John Brown
+    email: admin@cloudnativeworks.com 

@@ -1,0 +1,19 @@
+replicas: 4
+image:
+  repository: envoyproxy/envoy
+  tag: v1.33.0
+  pullPolicy: Always
+
+service:
+  type: NodePort
+  httpPort: 8080
+  adminPort: 9901
+  # nodePort: auto-assigned by Kubernetes (30000-32767 range)
+
+resources:
+  requests:
+    memory: "125Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "200m"

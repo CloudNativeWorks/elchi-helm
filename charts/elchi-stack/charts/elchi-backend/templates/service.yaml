@@ -1,0 +1,121 @@
+{{- $controllerVersion := regexReplaceAll "-arm64$" (index .Values.global.versions 0).tag "" }}
+---
+# Elchi Controller Service (only first version)
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: elchi-controller-{{ $controllerVersion | replace "." "-" }}
+  labels:
+    app: elchi-controller
+    version: {{ $controllerVersion }}
+    type: rest
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.controller.port }}
+      targetPort: {{ .Values.service.controller.port }}
+      protocol: TCP
+      name: http
+    - port: {{ .Values.service.controller.grpcPort }}
+      targetPort: {{ .Values.service.controller.grpcPort }}
+      protocol: TCP
+      name: grpc
+  selector:
+    app: elchi-controller
+    version: {{ $controllerVersion }}
+    type: rest
+---
+# Elchi Controller Headless Service (only first version)
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: elchi-controller-{{ $controllerVersion | replace "." "-" }}-headless
+  labels:
+    app: elchi-controller
+    version: {{ $controllerVersion }}
+    type: rest
+spec:
+  clusterIP: None
+  ports:
+    - port: {{ .Values.service.controller.port }}
+      targetPort: {{ .Values.service.controller.port }}
+      protocol: TCP
+      name: http
+    - port: {{ .Values.service.controller.grpcPort }}
+      targetPort: {{ .Values.service.controller.grpcPort }}
+      protocol: TCP
+      name: grpc
+  selector:
+    app: elchi-controller
+    version: {{ $controllerVersion }}
+    type: rest
+---
+# Elchi Registry Service
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: elchi-registry
+  labels:
+    app: elchi-registry
+    version: {{ $controllerVersion }}
+    type: grpc
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.registry.port }}
+      targetPort: {{ .Values.service.registry.port }}
+      protocol: TCP
+      name: grpc
+  selector:
+    app: elchi-registry
+    version: {{ $controllerVersion }}
+    type: grpc
+{{- range .Values.global.versions }}
+---
+# Control Plane Headless Service
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ $.Release.Namespace }}
+  name: elchi-control-plane-{{ regexReplaceAll "-arm64$" .tag "" | replace "." "-" }}-headless
+  labels:
+    app: elchi-control-plane
+    version: {{ regexReplaceAll "-arm64$" .tag "" }}
+    type: grpc
+spec:
+  clusterIP: None
+  ports:
+    - port: {{ $.Values.service.controlPlane.port }}
+      targetPort: {{ $.Values.service.controlPlane.port }}
+      protocol: TCP
+      name: grpc
+  selector:
+    app: elchi-control-plane
+    version: {{ regexReplaceAll "-arm64$" .tag "" }}
+    type: grpc
+---
+# Control Plane Service (external access)
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ $.Release.Namespace }}
+  name: elchi-control-plane-{{ regexReplaceAll "-arm64$" .tag "" | replace "." "-" }}
+  labels:
+    app: elchi-control-plane
+    version: {{ regexReplaceAll "-arm64$" .tag "" }}
+    type: grpc
+spec:
+  type: {{ $.Values.service.type }}
+  ports:
+    - port: {{ $.Values.service.controlPlane.port }}
+      targetPort: {{ $.Values.service.controlPlane.port }}
+      protocol: TCP
+      name: grpc
+  selector:
+    app: elchi-control-plane
+    version: {{ regexReplaceAll "-arm64$" .tag "" }}
+    type: grpc
+{{- end }}

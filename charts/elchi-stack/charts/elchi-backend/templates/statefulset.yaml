@@ -1,0 +1,150 @@
+{{- $controllerVersion := index .Values.global.versions 0 }}
+---
+# Controller StatefulSet (only first version)
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: elchi-controller-{{ regexReplaceAll "-arm64$" $controllerVersion.tag "" | replace "." "-" }}
+  labels:
+    app: elchi-controller
+    version: {{ regexReplaceAll "-arm64$" $controllerVersion.tag "" }}
+    type: rest
+spec:
+  serviceName: elchi-controller-{{ regexReplaceAll "-arm64$" $controllerVersion.tag "" | replace "." "-" }}-headless
+  replicas: {{ .Values.global.elchiBackend.controllerDefaultReplicas }}
+  selector:
+    matchLabels:
+      app: elchi-controller
+      version: {{ regexReplaceAll "-arm64$" $controllerVersion.tag "" }}
+      type: rest
+  template:
+    metadata:
+      labels:
+        app: elchi-controller
+        version: {{ regexReplaceAll "-arm64$" $controllerVersion.tag "" }}
+        type: rest
+    spec:
+      {{- if .Values.global.installMongo }}
+      initContainers:
+        - name: wait-for-mongodb
+          image: busybox:1.28
+          command: ['sh', '-c', 'until nc -z mongodb-service.{{ .Release.Namespace }} 27017; do echo waiting for mongodb; sleep 2; done;']
+      {{- end }}
+      containers:
+        - name: elchi-controller
+          image: "{{ .Values.image.repository }}:{{ $controllerVersion.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["elchi-controller"]
+          resources:
+            {{- toYaml .Values.resources.controller | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.controller.port }}
+              protocol: TCP
+            - name: grpc
+              containerPort: {{ .Values.service.controller.grpcPort }}
+              protocol: TCP
+          volumeMounts:
+            - name: config-volume
+              mountPath: /root/.configs
+            - name: timezone
+              mountPath: /etc/localtime
+              readOnly: true
+          env:
+            - name: TZ
+              value: {{ .Values.global.timezone | default "UTC" | quote }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.configMap.name }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.controller.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.controller.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ .Values.configMap.name }}
+        - name: timezone
+          hostPath:
+            path: {{ .Values.global.timezonePath | default "/etc/localtime" }}
+{{- range .Values.global.versions }}
+---
+# Control Plane StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: {{ $.Release.Namespace }}
+  name: elchi-control-plane-{{ regexReplaceAll "-arm64$" .tag "" | replace "." "-" }}
+  labels:
+    app: elchi-control-plane
+    version: {{ regexReplaceAll "-arm64$" .tag "" }}
+    type: grpc
+spec:
+  serviceName: elchi-control-plane-{{ regexReplaceAll "-arm64$" .tag "" | replace "." "-" }}-headless
+  replicas: {{ $.Values.global.elchiBackend.controlPlaneDefaultReplicas }}
+  selector:
+    matchLabels:
+      app: elchi-control-plane
+      version: {{ regexReplaceAll "-arm64$" .tag "" }}
+      type: grpc
+  template:
+    metadata:
+      labels:
+        app: elchi-control-plane
+        version: {{ regexReplaceAll "-arm64$" .tag "" }}
+        type: grpc
+    spec:
+      {{- if $.Values.global.installMongo }}
+      initContainers:
+        - name: wait-for-mongodb
+          image: busybox:1.28
+          command: ['sh', '-c', 'until nc -z mongodb-service.{{ $.Release.Namespace }} 27017; do echo waiting for mongodb; sleep 2; done;']
+      {{- end }}
+      containers:
+        - name: elchi-control-plane
+          image: "{{ $.Values.image.repository }}:{{ .tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          args: ["elchi-control-plane"]
+          resources:
+            {{- toYaml $.Values.resources.controlPlane | nindent 12 }}
+          ports:
+            - name: grpc
+              containerPort: {{ $.Values.service.controlPlane.port }}
+              protocol: TCP
+          volumeMounts:
+            - name: config-volume
+              mountPath: /root/.configs
+            - name: timezone
+              mountPath: /etc/localtime
+              readOnly: true
+          env:
+            - name: TZ
+              value: {{ $.Values.global.timezone | default "UTC" | quote }}
+          envFrom:
+            - configMapRef:
+                name: {{ $.Values.configMap.name }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ $.Values.service.controlPlane.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: {{ $.Values.service.controlPlane.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ $.Values.configMap.name }}
+        - name: timezone
+          hostPath:
+            path: {{ $.Values.global.timezonePath | default "/etc/localtime" }}
+{{- end }}

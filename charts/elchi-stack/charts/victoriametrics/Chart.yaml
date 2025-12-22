@@ -1,0 +1,15 @@
+apiVersion: v2
+name: victoriametrics
+description: VictoriaMetrics time-series database for storing Elchi proxy metrics
+type: application
+version: 1.0.0
+appVersion: "1.93.5"
+keywords:
+  - metrics
+  - database
+  - time-series
+  - storage
+  - monitoring
+maintainers:
+  - name: John Brown
+    email: admin@cloudnativeworks.com 

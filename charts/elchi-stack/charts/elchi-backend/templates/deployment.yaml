@@ -1,0 +1,71 @@
+{{- $controllerVersion := regexReplaceAll "-arm64$" (index .Values.global.versions 0).tag "" }}
+# Elchi Registry Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elchi-registry
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: elchi-registry
+    version: {{ $controllerVersion }}
+    type: grpc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elchi-registry
+      version: {{ $controllerVersion }}
+      type: grpc
+  template:
+    metadata:
+      labels:
+        app: elchi-registry
+        version: {{ $controllerVersion }}
+        type: grpc
+    spec:
+      {{- if .Values.global.installMongo }}
+      initContainers:
+        - name: wait-for-mongodb
+          image: busybox:1.28
+          command: ['sh', '-c', 'until nc -z mongodb-service.{{ .Release.Namespace }} 27017; do echo waiting for mongodb; sleep 2; done;']
+      {{- end }}
+      containers:
+        - name: elchi-registry
+          image: "{{ .Values.image.repository }}:{{ (index .Values.global.versions 0).tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["elchi-registry"]
+          resources:
+            {{- toYaml .Values.resources.registry | nindent 12 }}
+          ports:
+            - name: grpc
+              containerPort: {{ .Values.service.registry.port }}
+              protocol: TCP
+          volumeMounts:
+            - name: config-volume
+              mountPath: /root/.configs
+            - name: timezone
+              mountPath: /etc/localtime
+              readOnly: true
+          env:
+            - name: TZ
+              value: {{ $.Values.global.timezone | default "UTC" | quote }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.configMap.name }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.registry.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.registry.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ .Values.configMap.name }}
+        - name: timezone
+          hostPath:
+            path: {{ $.Values.global.timezonePath | default "/etc/localtime" }}

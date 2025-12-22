@@ -1,0 +1,14 @@
+apiVersion: v2
+name: envoy
+description: Envoy Proxy configuration and routing for Elchi proxy management platform
+type: application
+version: 1.0.0
+appVersion: "1.33.0"
+keywords:
+  - envoy
+  - proxy
+  - routing
+  - load-balancer
+maintainers:
+  - name: John Brown
+    email: admin@cloudnativeworks.com

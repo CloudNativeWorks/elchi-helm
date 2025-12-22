@@ -1,0 +1,10 @@
+.dev.txt
+values_dev.yaml
+values_prod.yaml
+values_cloud.yaml
+values_office.yaml
+values_prod_cloud.yaml
+helm.sh
+CLAUDE.md
+.claude
+charts/elchi-stack/values_prod_local.yaml

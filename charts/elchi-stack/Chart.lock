@@ -1,0 +1,21 @@
+dependencies:
+- name: elchi
+  repository: file://charts/elchi
+  version: 1.0.0
+- name: elchi-backend
+  repository: file://charts/elchi-backend
+  version: 1.0.0
+- name: envoy
+  repository: file://charts/envoy
+  version: 1.0.0
+- name: mongodb
+  repository: file://charts/mongodb
+  version: 1.0.0
+- name: otel
+  repository: file://charts/otel
+  version: 1.0.0
+- name: victoriametrics
+  repository: file://charts/victoriametrics
+  version: 1.0.0
+digest: sha256:11d4504c11573e060ce1b46925ee79d0ecf08b2f90b3e7031804409bae65e958
+generated: "2025-08-07T20:07:51.112682+03:00"

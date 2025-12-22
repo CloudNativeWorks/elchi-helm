@@ -1,0 +1,6 @@
+apiVersion: v2
+name: grafana
+description: Grafana monitoring and visualization platform
+type: application
+version: 1.0.0
+appVersion: "12.2.0"

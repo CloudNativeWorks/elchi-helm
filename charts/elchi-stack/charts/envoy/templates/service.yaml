@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: envoy-service
+  namespace: {{ .Release.Namespace }}
+  {{- with $.Values.global.envoy.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ $.Values.global.envoy.service.type }}
+  ports:
+    - port: {{ .Values.service.httpPort }}
+      targetPort: 1989
+      protocol: TCP
+      name: http
+      {{- if and (eq $.Values.global.envoy.service.type "NodePort") $.Values.global.envoy.service.httpNodePort }}
+      nodePort: {{ $.Values.global.envoy.service.httpNodePort }}
+      {{- end }}
+    - port: {{ .Values.service.adminPort }}
+      targetPort: 9901
+      protocol: TCP
+      name: admin
+      {{- if and (eq $.Values.global.envoy.service.type "NodePort") $.Values.global.envoy.service.adminNodePort }}
+      nodePort: {{ $.Values.global.envoy.service.adminNodePort }}
+      {{- end }}
+  selector:
+    app: envoy

@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ .Values.configMap.name }}
+data:
+  config-prod.yaml: |
+    ELCHI_ADDRESS: {{ .Values.global.mainAddress | quote }}
+    ELCHI_PORT: {{ if .Values.global.port }}{{ .Values.global.port | quote }}{{ else if .Values.global.tlsEnabled }}"443"{{ else }}"80"{{ end }}
+    ELCHI_TLS_ENABLED: {{ .Values.global.tlsEnabled | quote }}
+    ELCHI_VERSIONS: [{{- $versions := list }}{{- range .Values.global.versions }}{{- $envoyVersion := regexFind "envoy[0-9]+\\.[0-9]+\\.[0-9]+" .tag | replace "envoy" "v" }}{{- $versions = append $versions $envoyVersion }}{{- end }}{{- range $index, $version := $versions }}{{- if $index }}, {{ end }}'{{ $version }}'{{- end }}]
+    ELCHI_INTERNAL_COMMUNICATION: {{ .Values.global.internalCommunication | quote }}
+    ELCHI_INTERNAL_ADDRESS_PORT: "envoy-service.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:8080"
+    ELCHI_NAMESPACE: {{ .Release.Namespace | quote }}
+    ELCHI_JWT_SECRET: {{ .Values.global.jwt.secret | quote }}
+    ELCHI_JWT_ACCESS_TOKEN_DURATION: {{ .Values.global.jwt.accessTokenDuration | quote }}
+    ELCHI_JWT_REFRESH_TOKEN_DURATION: {{ .Values.global.jwt.refreshTokenDuration | quote }}
+    ELCHI_CORS_ALLOWED_ORIGINS: {{ .Values.global.cors.allowedOrigins | quote }}
+
+    # Registry service configuration
+    REGISTRY_ADDRESS: "elchi-registry.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}"
+    REGISTRY_PORT: {{ .Values.service.registry.port | quote }}
+
+    {{- if .Values.global.installMongo }}
+    # Self-service MongoDB configuration
+    MONGODB_HOSTS: "mongodb-service.{{ .Release.Namespace }}"
+    MONGODB_USERNAME: {{ default "elchi" .Values.global.mongodb.username | quote }}
+    MONGODB_PASSWORD: {{ default "elchi" .Values.global.mongodb.password | quote }}
+    MONGODB_DATABASE: {{ default "elchi" .Values.global.mongodb.database | quote }}
+    MONGODB_SCHEME: "mongodb"
+    MONGODB_PORT: "27017"
+    MONGODB_REPLICASET: ""
+    MONGODB_TIMEOUTMS: "5000"
+    MONGODB_TLS_ENABLED: "false"
+    MONGODB_AUTH_SOURCE: "admin"
+    MONGODB_AUTH_MECHANISM: "SCRAM-SHA-1"
+    {{- else }}
+    # External MongoDB configuration
+    {{- if not .Values.global.mongodb.hosts }}
+    {{- fail "When installMongo is false, global.mongodb.hosts must be provided" }}
+    {{- end }}
+    MONGODB_HOSTS: {{ .Values.global.mongodb.hosts | quote }}
+    MONGODB_USERNAME: {{ .Values.global.mongodb.username | quote }}
+    MONGODB_PASSWORD: {{ .Values.global.mongodb.password | quote }}
+    MONGODB_DATABASE: {{ .Values.global.mongodb.database | quote }}
+    MONGODB_SCHEME: {{ default "mongodb" .Values.global.mongodb.scheme | quote }}
+    MONGODB_PORT: {{ default "27017" .Values.global.mongodb.port | quote }}
+    MONGODB_REPLICASET: {{ default "" .Values.global.mongodb.replicaset | quote }}
+    MONGODB_TIMEOUTMS: {{ default "9000" .Values.global.mongodb.timeoutMs | quote }}
+    MONGODB_TLS_ENABLED: {{ default "false" .Values.global.mongodb.tlsEnabled | quote }}
+    MONGODB_AUTH_SOURCE: {{ default "admin" .Values.global.mongodb.authSource | quote }}
+    MONGODB_AUTH_MECHANISM: {{ default "" .Values.global.mongodb.authMechanism | quote }}
+    {{- end }}
+
+    LOGGING:
+      level: {{ .Values.config.logging.level }}
+      format: {{ .Values.config.logging.formatter }}
+      output_path: stdout
+
+    LOG_REPORTCALLER: {{ .Values.config.logging.reportCaller | quote }}
+
+    # ACME Configuration for automated certificate management
+    ACME:
+      enabled: true
+      default_environment: "production"        # "staging" | "production" - Use staging during development
+      default_ca_provider: "letsencrypt"    # "letsencrypt" | "google" - Default CA for new accounts
+
+    # CA Providers Configuration (Multi-CA Support)
+    CA_PROVIDERS:
+      letsencrypt:
+        name: "Let's Encrypt"
+        description: "Free, automated, and open Certificate Authority"
+        supported: true
+        requires_eab: false
+        environments:
+          staging:
+            directory_url: "https://acme-staging-v02.api.letsencrypt.org/directory"
+            rate_limits:
+              certificates_per_domain: 50   # per week
+              accounts_per_ip: 50           # per 3 hours
+          production:
+            directory_url: "https://acme-v02.api.letsencrypt.org/directory"
+            rate_limits:
+              certificates_per_domain: 50
+              accounts_per_ip: 50
+
+      google:
+        name: "Google Trust Services"
+        description: "Google Public Certificate Authority"
+        supported: true
+        requires_eab: true
+        eab_instructions_url: "https://cloud.google.com/certificate-manager/docs/public-ca"
+        environments:
+          staging:
+            directory_url: "https://dv.acme-v02.test-api.pki.goog/directory"
+            rate_limits:
+              certificates_per_account: 10000  # per week
+          production:
+            directory_url: "https://dv.acme-v02.api.pki.goog/directory"
+            rate_limits:
+              certificates_per_account: 10000
