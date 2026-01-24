@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: envoy-service
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "envoy.labels" . | nindent 4 }}
   {{- with $.Values.global.envoy.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}

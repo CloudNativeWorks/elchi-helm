@@ -8,3 +8,6 @@ helm.sh
 CLAUDE.md
 .claude
 charts/elchi-stack/values_prod_local.yaml
+install.sh
+uninstall.sh
+charts/elchi-stack/values_cloud2.yaml

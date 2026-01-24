@@ -1,3 +1,4 @@
+{{- if .Values.global.installVictoriaMetrics }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -5,6 +6,7 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   labels:
     app: victoriametrics
+    {{- include "victoriametrics.labels" . | nindent 4 }}
 spec:
   serviceName: victoriametrics
   replicas: 1
@@ -15,11 +17,22 @@ spec:
     metadata:
       labels:
         app: victoriametrics
+        {{- include "victoriametrics.labels" . | nindent 8 }}
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
       - name: victoriametrics
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
         {{- if $.Values.global.timezone }}
         env:
         - name: TZ
@@ -49,7 +62,8 @@ spec:
       name: storage
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: {{ .Values.persistence.storageClass }}
+      storageClassName: {{ .Values.global.storageClass }}
       resources:
         requests:
-          storage: {{ .Values.persistence.size }} 
+          storage: {{ .Values.persistence.size }}
+{{- end }}

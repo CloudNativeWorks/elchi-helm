@@ -1,0 +1,86 @@
+{{- if .Values.global.installGslb }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: elchi-coredns
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: elchi-coredns
+    {{- include "elchi-coredns.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: elchi-coredns
+  template:
+    metadata:
+      labels:
+        app: elchi-coredns
+        {{- include "elchi-coredns.labels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+        - name: coredns
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          args:
+            - -conf
+            - /etc/coredns/Corefile
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          ports:
+            - name: dns
+              containerPort: {{ .Values.service.containerPort }}
+              hostPort: {{ .Values.service.hostPort }}
+              protocol: UDP
+            - name: dns-tcp
+              containerPort: {{ .Values.service.containerPort }}
+              hostPort: {{ .Values.service.hostPort }}
+              protocol: TCP
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/coredns
+              readOnly: true
+            - name: timezone
+              mountPath: /etc/localtime
+              readOnly: true
+          env:
+            - name: TZ
+              value: {{ $.Values.global.timezone | default "UTC" | quote }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.containerPort }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.containerPort }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: config-volume
+          configMap:
+            name: elchi-coredns-config
+        - name: timezone
+          hostPath:
+            path: {{ $.Values.global.timezonePath | default "/etc/localtime" }}
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+      dnsPolicy: Default
+      hostNetwork: false
+{{- end }}

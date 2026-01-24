@@ -1,0 +1,15 @@
+{{- if .Values.global.installVictoriaMetrics }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: victoriametrics-pdb
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: victoriametrics
+    {{- include "victoriametrics.labels" . | nindent 4 }}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: victoriametrics
+{{- end }}

@@ -7,11 +7,11 @@ replicas: 3
 
 resources:
   requests:
-    memory: "255Mi"
-    cpu: "200m"
+    memory: "32Mi"
+    cpu: "10m"
   limits:
-    memory: "512Mi"
-    cpu: "300m"
+    memory: "128Mi"
+    cpu: "100m"
 
 service:
   type: ClusterIP

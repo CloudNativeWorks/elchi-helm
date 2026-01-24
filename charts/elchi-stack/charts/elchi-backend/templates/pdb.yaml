@@ -1,0 +1,52 @@
+{{- $controllerVersion := regexReplaceAll "-arm64$" (index .Values.global.versions 0).tag "" }}
+---
+# Registry PDB
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: elchi-registry-pdb
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: elchi-registry
+    {{- include "elchi-backend.registry.labels" . | nindent 4 }}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: elchi-registry
+---
+# Controller PDB
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: elchi-controller-pdb
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: elchi-controller
+    {{- include "elchi-backend.controller.labels" . | nindent 4 }}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: elchi-controller
+      version: {{ $controllerVersion }}
+      type: rest
+{{- range .Values.global.versions }}
+---
+# Control Plane PDB
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: elchi-control-plane-{{ regexReplaceAll "-arm64$" .tag "" | replace "." "-" }}-pdb
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app: elchi-control-plane
+    {{- include "elchi-backend.controlplane.labels" $ | nindent 4 }}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: elchi-control-plane
+      version: {{ regexReplaceAll "-arm64$" .tag "" }}
+      type: grpc
+{{- end }}

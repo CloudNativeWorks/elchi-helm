@@ -1,0 +1,124 @@
+===============================================================================
+ _____  _       _     _   ____  _             _
+| ____|| | ___ | |__ (_) / ___|| |_ __ _  ___| | __
+|  _|  | |/ __|| '_ \| | \___ \| __/ _` |/ __| |/ /
+| |___ | | (__ | | | | |  ___) | || (_| | (__|   <
+|_____|_|\_\___||_| |_|_| |____/ \__\__,_|\___|_|\_\
+
+===============================================================================
+
+Thank you for installing {{ .Chart.Name }}!
+
+Your release is named: {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+
+===============================================================================
+COMPONENTS DEPLOYED:
+===============================================================================
+
+1. Elchi UI (Frontend)
+   - Access: http://{{ .Values.global.mainAddress }}{{- if .Values.global.port }}:{{ .Values.global.port }}{{- end }}
+
+2. Elchi Backend Services
+   - Controller: elchi-controller.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}
+   - Control Plane: elchi-control-plane.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}
+   - Registry: elchi-registry.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}
+
+3. Envoy Proxy
+{{- if eq .Values.global.envoy.service.type "NodePort" }}
+   - Type: NodePort
+   - Get HTTP NodePort:
+     kubectl get svc envoy-service -n {{ .Release.Namespace }} -o jsonpath='{.spec.ports[?(@.name=="http")].nodePort}'
+{{- else if eq .Values.global.envoy.service.type "LoadBalancer" }}
+   - Type: LoadBalancer
+   - Get External IP:
+     kubectl get svc envoy-service -n {{ .Release.Namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+{{- else }}
+   - Type: ClusterIP
+   - Service: envoy-service.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}
+{{- end }}
+
+{{- if .Values.global.installMongo }}
+
+4. MongoDB
+   - Service: mongodb-service.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:27017
+   - Username: {{ .Values.global.mongodb.username }}
+   - Database: {{ .Values.global.mongodb.database }}
+{{- end }}
+
+{{- if .Values.global.installVictoriaMetrics }}
+
+5. VictoriaMetrics
+   - Service: victoriametrics.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:8428
+   - Query UI: http://<node-ip>:<nodeport>/vmui
+{{- end }}
+
+6. Grafana
+   - Service: grafana.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:3000
+   - Username: {{ .Values.global.grafana.user }}
+   - Access via: http://{{ .Values.global.mainAddress }}{{- if .Values.global.port }}:{{ .Values.global.port }}{{- end }}/grafana/
+
+7. OpenTelemetry Collector
+   - Service: otel-collector.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}
+   - OTLP gRPC: 4317
+   - OTLP HTTP: 4318
+
+{{- if .Values.global.installGslb }}
+
+8. GSLB CoreDNS
+   - DNS Zone: {{ .Values.global.gslb.zone }}
+   - Service: elchi-coredns.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:53
+   - TTL: {{ .Values.global.gslb.ttl }}s
+{{- end }}
+
+===============================================================================
+USEFUL COMMANDS:
+===============================================================================
+
+# Check all pods status
+kubectl get pods -n {{ .Release.Namespace }}
+
+# Check all services
+kubectl get svc -n {{ .Release.Namespace }}
+
+# View UI logs
+kubectl logs -f deployment/elchi -n {{ .Release.Namespace }}
+
+# View Registry logs
+kubectl logs -f deployment/elchi-registry -n {{ .Release.Namespace }}
+
+# Port forward to Grafana (local access)
+kubectl port-forward svc/grafana 3000:3000 -n {{ .Release.Namespace }}
+
+# Port forward to Envoy (local access)
+kubectl port-forward svc/envoy-service 8080:80 -n {{ .Release.Namespace }}
+
+{{- if .Values.global.installMongo }}
+
+# Connect to MongoDB
+kubectl exec -it mongodb-0 -n {{ .Release.Namespace }} -- mongosh -u {{ .Values.global.mongodb.username }} -p
+{{- end }}
+
+===============================================================================
+SECURITY REMINDERS:
+===============================================================================
+
+For production deployments, ensure you have changed:
+
+  - global.jwt.secret (minimum 32 characters)
+  - global.grafana.user and global.grafana.password
+{{- if .Values.global.installMongo }}
+  - global.mongodb.username and global.mongodb.password
+{{- end }}
+{{- if .Values.global.installGslb }}
+  - global.gslb.secret
+{{- end }}
+
+===============================================================================
+DOCUMENTATION:
+===============================================================================
+
+- Chart Documentation: https://charts.elchi.io
+- GitHub Repository: https://github.com/cloudnativeworks/elchi-helm
+
+===============================================================================

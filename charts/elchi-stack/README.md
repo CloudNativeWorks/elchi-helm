@@ -13,6 +13,26 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 - **Control Plane**: Distributes configuration snapshots to Envoy proxies
 - **Registry**: Handles routing and service discovery between components
 
+## Requirements
+
+| Requirement | Minimum Version | Maximum Version | Notes |
+|-------------|-----------------|-----------------|-------|
+| **Kubernetes** | 1.21 | 1.35+ | Uses `policy/v1` PDB (requires 1.21+) |
+| **Helm** | 3.0.0 | 3.x | Chart API v2 |
+| **CPU** | 1 core | - | Per node |
+| **Memory** | 2 GB | - | Per node |
+
+> **Tested Versions**: Kubernetes 1.21 - 1.35 (current latest)
+
+### API Versions Used
+
+| API | Version | Kubernetes Requirement |
+|-----|---------|------------------------|
+| `apps/v1` | Stable | 1.9+ |
+| `policy/v1` | Stable | 1.21+ |
+| `v1` (core) | Stable | 1.0+ |
+| `rbac.authorization.k8s.io/v1` | Stable | 1.8+ |
+
 ## Available Versions
 > Syntax: `<elchiBackendVersion>`-`<goControlPlaneVersion>`-`<envoyVersion>`
 
@@ -30,7 +50,9 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 | `global.timezonePath` | Custom path to timezone file on host (advanced users only) | `"/etc/localtime"` |
 | `global.installMongo` | Whether to use self-hosted MongoDB | `true` |
 | `global.installVictoriaMetrics` | Whether to use self-hosted Victoria Metrics | `true` |
+| `global.installGslb` | Whether to deploy GSLB CoreDNS plugin | `true` |
 | `global.internalCommunication` | Enable internal communication between services | `false` |
+| `global.storageClass` | Storage class for all PVCs (mongodb, victoriametrics) | `"standard"` |
 | `global.versions` | List of Elchi backend versions to deploy | `[{tag: v0.1.0-v0.13.4-envoy1.36.2}]` |
 | `global.mongodb.hosts` | MongoDB connection hosts (comma-separated for replica set) | `""` |
 | `global.mongodb.username` | MongoDB username | `"elchi"` |
@@ -56,6 +78,12 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 | `global.jwt.accessTokenDuration` | Access token expiration duration | `"1h"` |
 | `global.jwt.refreshTokenDuration` | Refresh token expiration duration | `"5h"` |
 | `global.cors.allowedOrigins` | CORS allowed origins (use "*" for all, or comma-separated domains) | `"*"` |
+| `global.gslb.zone` | DNS zone for GSLB resolution | `"gslb.elchi"` |
+| `global.gslb.secret` | Shared secret for CoreDNS plugin authentication | `"elchi-secret-change-me"` |
+| `global.gslb.ttl` | Default TTL for DNS records in seconds | `300` |
+| `global.gslb.syncInterval` | Interval for syncing DNS records from backend | `"5m"` |
+| `global.gslb.timeout` | HTTP request timeout for backend communication | `"10s"` |
+| `global.gslb.fallthrough` | Whether to pass unmatched queries to next plugin | `true` |
 
 ## ElchiBackend Chart Values
 
@@ -63,23 +91,24 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 |-----------|-------------|---------|
 | `image.repository` | Elchi backend image repository | `"jhonbrownn/elchi-backend"` |
 | `image.pullPolicy` | Image pull policy | `"Always"` |
-| `resources.controller.requests.memory` | Controller service memory request | `"255Mi"` |
-| `resources.controller.requests.cpu` | Controller service CPU request | `"150m"` |
-| `resources.controller.limits.memory` | Controller service memory limit | `"512Mi"` |
-| `resources.controller.limits.cpu` | Controller service CPU limit | `"250m"` |
-| `resources.controlPlane.requests.memory` | Control Plane service memory request | `"256Mi"` |
-| `resources.controlPlane.requests.cpu` | Control Plane service CPU request | `"150m"` |
-| `resources.controlPlane.limits.memory` | Control Plane service memory limit | `"512Mi"` |
-| `resources.controlPlane.limits.cpu` | Control Plane service CPU limit | `"250m"` |
-| `resources.registry.requests.memory` | Registry service memory request | `"256Mi"` |
-| `resources.registry.requests.cpu` | Registry service CPU request | `"150m"` |
-| `resources.registry.limits.memory` | Registry service memory limit | `"512Mi"` |
-| `resources.registry.limits.cpu` | Registry service CPU limit | `"250m"` |
+| `resources.controller.requests.memory` | Controller service memory request | `"64Mi"` |
+| `resources.controller.requests.cpu` | Controller service CPU request | `"25m"` |
+| `resources.controller.limits.memory` | Controller service memory limit | `"256Mi"` |
+| `resources.controller.limits.cpu` | Controller service CPU limit | `"200m"` |
+| `resources.controlPlane.requests.memory` | Control Plane service memory request | `"64Mi"` |
+| `resources.controlPlane.requests.cpu` | Control Plane service CPU request | `"25m"` |
+| `resources.controlPlane.limits.memory` | Control Plane service memory limit | `"256Mi"` |
+| `resources.controlPlane.limits.cpu` | Control Plane service CPU limit | `"200m"` |
+| `resources.registry.requests.memory` | Registry service memory request | `"64Mi"` |
+| `resources.registry.requests.cpu` | Registry service CPU request | `"25m"` |
+| `resources.registry.limits.memory` | Registry service memory limit | `"256Mi"` |
+| `resources.registry.limits.cpu` | Registry service CPU limit | `"200m"` |
 | `service.type` | Kubernetes service type | `"ClusterIP"` |
 | `service.controller.port` | Controller REST service port | `8099` |
 | `service.controller.grpcPort` | Controller gRPC service port | `50051` |
 | `service.controlPlane.port` | Control Plane service port | `18000` |
-| `service.registry.port` | Registry service port | `9090` |
+| `service.registry.port` | Registry gRPC service port | `9090` |
+| `service.registry.metricsPort` | Registry metrics service port | `9091` |
 | `config.logging.level` | Logging level | `"info"` |
 | `config.logging.formatter` | Log formatter type | `"text"` |
 | `config.logging.reportCaller` | Whether to report caller in logs | `"false"` |
@@ -94,10 +123,10 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 | `image.pullPolicy` | Image pull policy | `"Always"` |
 | `service.type` | Kubernetes service type | `"ClusterIP"` |
 | `service.port` | Service port | `80` |
-| `resources.requests.memory` | Memory request | `"255Mi"` |
-| `resources.requests.cpu` | CPU request | `"200m"` |
-| `resources.limits.memory` | Memory limit | `"512Mi"` |
-| `resources.limits.cpu` | CPU limit | `"300m"` |
+| `resources.requests.memory` | Memory request | `"32Mi"` |
+| `resources.requests.cpu` | CPU request | `"10m"` |
+| `resources.limits.memory` | Memory limit | `"128Mi"` |
+| `resources.limits.cpu` | CPU limit | `"100m"` |
 
 ## Envoy Chart Values
 
@@ -110,10 +139,10 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 | `service.type` | Kubernetes service type | `"NodePort"` |
 | `service.httpPort` | HTTP service port | `8080` |
 | `service.adminPort` | Admin service port | `9901` |
-| `resources.requests.memory` | Memory request | `"128Mi"` |
-| `resources.requests.cpu` | CPU request | `"100m"` |
-| `resources.limits.memory` | Memory limit | `"256Mi"` |
-| `resources.limits.cpu` | CPU limit | `"200m"` |
+| `resources.requests.memory` | Memory request | `"32Mi"` |
+| `resources.requests.cpu` | CPU request | `"10m"` |
+| `resources.limits.memory` | Memory limit | `"128Mi"` |
+| `resources.limits.cpu` | CPU limit | `"100m"` |
 
 ## MongoDB Chart Values
 
@@ -124,12 +153,11 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 | `image.tag` | MongoDB image tag | `"6.0.12"` |
 | `image.pullPolicy` | Image pull policy | `"IfNotPresent"` |
 | `persistence.enabled` | Enable persistence | `true` |
-| `persistence.size` | PVC size | `"3Gi"` |
-| `persistence.storageClass` | PVC storage class | `"standard"` |
+| `persistence.size` | PVC size | `"5Gi"` |
 | `service.type` | Kubernetes service type | `"ClusterIP"` |
 | `service.port` | Service port | `27017` |
-| `resources.requests.memory` | Memory request | `"256Mi"` |
-| `resources.requests.cpu` | CPU request | `"250m"` |
+| `resources.requests.memory` | Memory request | `"128Mi"` |
+| `resources.requests.cpu` | CPU request | `"50m"` |
 | `resources.limits.memory` | Memory limit | `"512Mi"` |
 | `resources.limits.cpu` | CPU limit | `"500m"` |
 
@@ -142,12 +170,11 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 | `image.pullPolicy` | Image pull policy | `"IfNotPresent"` |
 | `service.type` | Kubernetes service type | `"ClusterIP"` |
 | `service.port` | Service port | `8428` |
-| `storage.size` | Storage size for metrics data | `"10Gi"` |
-| `storage.storageClass` | Storage class | `"standard"` |
-| `retentionPeriod` | Data retention period | `"30d"` |
-| `resources.requests.memory` | Memory request | `"256Mi"` |
-| `resources.requests.cpu` | CPU request | `"100m"` |
-| `resources.limits.memory` | Memory limit | `"512Mi"` |
+| `persistence.size` | Storage size for metrics data | `"5Gi"` |
+| `retentionPeriod` | Data retention period | `"15d"` |
+| `resources.requests.memory` | Memory request | `"64Mi"` |
+| `resources.requests.cpu` | CPU request | `"25m"` |
+| `resources.limits.memory` | Memory limit | `"256Mi"` |
 | `resources.limits.cpu` | CPU limit | `"200m"` |
 
 ## OpenTelemetry Collector Chart Values
@@ -160,10 +187,10 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 | `service.type` | Kubernetes service type | `"ClusterIP"` |
 | `service.grpcPort` | gRPC service port | `4317` |
 | `service.httpPort` | HTTP service port | `4318` |
-| `resources.requests.memory` | Memory request | `"256Mi"` |
-| `resources.requests.cpu` | CPU request | `"100m"` |
-| `resources.limits.memory` | Memory limit | `"512Mi"` |
-| `resources.limits.cpu` | CPU limit | `"200m"` |
+| `resources.requests.memory` | Memory request | `"32Mi"` |
+| `resources.requests.cpu` | CPU request | `"10m"` |
+| `resources.limits.memory` | Memory limit | `"128Mi"` |
+| `resources.limits.cpu` | CPU limit | `"100m"` |
 
 ## Grafana Chart Values
 
@@ -174,10 +201,10 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 | `image.pullPolicy` | Image pull policy | `"IfNotPresent"` |
 | `service.type` | Kubernetes service type | `"ClusterIP"` |
 | `service.port` | Service port | `3000` |
-| `resources.requests.memory` | Memory request | `"256Mi"` |
-| `resources.requests.cpu` | CPU request | `"200m"` |
-| `resources.limits.memory` | Memory limit | `"1Gi"` |
-| `resources.limits.cpu` | CPU limit | `"500m"` |
+| `resources.requests.memory` | Memory request | `"64Mi"` |
+| `resources.requests.cpu` | CPU request | `"25m"` |
+| `resources.limits.memory` | Memory limit | `"256Mi"` |
+| `resources.limits.cpu` | CPU limit | `"200m"` |
 | `datasource.name` | Datasource name | `"VictoriaMetrics"` |
 | `datasource.type` | Datasource type | `"prometheus"` |
 | `datasource.access` | Datasource access mode | `"proxy"` |
@@ -344,6 +371,22 @@ kubectl delete namespace elchi-stack
 - **📊 VictoriaMetrics**: Time-series database for metrics storage (optional - supports external)
 - **📈 OpenTelemetry Collector**: Collects and forwards metrics to VictoriaMetrics
 - **📉 Grafana**: Visualization and monitoring dashboards for metrics and analytics
+- **🌍 Elchi CoreDNS**: GSLB DNS resolution with CoreDNS plugin (DaemonSet)
+
+## Elchi CoreDNS Chart Values
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `image.repository` | CoreDNS image repository | `"jhonbrownn/elchi-coredns"` |
+| `image.tag` | CoreDNS image tag | `"latest"` |
+| `image.pullPolicy` | Image pull policy | `"IfNotPresent"` |
+| `service.type` | Kubernetes service type | `"ClusterIP"` |
+| `service.dnsPort` | DNS service port | `53` |
+| `resources.requests.memory` | Memory request | `"32Mi"` |
+| `resources.requests.cpu` | CPU request | `"10m"` |
+| `resources.limits.memory` | Memory limit | `"128Mi"` |
+| `resources.limits.cpu` | CPU limit | `"100m"` |
+| `forwarders` | DNS forwarders for non-GSLB queries | `["8.8.8.8", "8.8.4.4"]` |
 
 ## Notes
 
@@ -387,3 +430,4 @@ kubectl delete namespace elchi-stack
 - **JWT Secret** (`global.jwt.secret`): Change to a secure, randomly generated value of at least 32 characters. The default value is provided for development purposes only.
 - **Grafana Credentials** (`global.grafana.user` and `global.grafana.password`): Change the default credentials for Grafana login. The default values (elchi/elchi) should never be used in production environments.
 - **MongoDB Credentials** (`global.mongodb.username` and `global.mongodb.password`): If using the built-in MongoDB, change the default credentials.
+- **GSLB Secret** (`global.gslb.secret`): Change to a secure value for CoreDNS plugin authentication.

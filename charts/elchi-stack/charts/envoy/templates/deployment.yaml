@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: envoy
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "envoy.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicas }}
   selector:
@@ -12,11 +14,22 @@ spec:
     metadata:
       labels:
         app: envoy
+        {{- include "envoy.labels" . | nindent 8 }}
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        fsGroup: 101
       containers:
         - name: envoy
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           env:
             - name: TZ
               value: {{ $.Values.global.timezone | default "UTC" | quote }}

@@ -1,0 +1,23 @@
+image:
+  repository: jhonbrownn/elchi-coredns
+  tag: latest
+  pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    memory: "32Mi"
+    cpu: "10m"
+  limits:
+    memory: "128Mi"
+    cpu: "100m"
+
+service:
+  type: ClusterIP
+  # containerPort: internal port CoreDNS listens on (non-privileged)
+  containerPort: 1053
+  # hostPort: external port exposed on each node
+  hostPort: 53
+
+forwarders:
+  - "8.8.8.8"
+  - "8.8.4.4"

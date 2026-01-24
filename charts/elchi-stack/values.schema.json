@@ -35,15 +35,30 @@
                     "description": "Whether to use self-hosted VictoriaMetrics",
                     "default": true
                 },
+                "installGslb": {
+                    "type": "boolean",
+                    "description": "Whether to deploy GSLB CoreDNS plugin",
+                    "default": true
+                },
                 "timezone": {
                     "type": "string",
                     "description": "Timezone configuration. If empty, will use host timezone",
-                    "default": "UTC"
+                    "default": ""
+                },
+                "timezonePath": {
+                    "type": "string",
+                    "description": "Custom path to timezone file on host",
+                    "default": "/etc/localtime"
                 },
                 "internalCommunication": {
                     "type": "boolean",
                     "description": "Whether to use internal communication",
                     "default": false
+                },
+                "storageClass": {
+                    "type": "string",
+                    "description": "Storage class for all PVCs (mongodb, victoriametrics)",
+                    "default": "standard"
                 },
                 "versions": {
                     "type": "array",
@@ -138,15 +153,15 @@
                 "grafana": {
                     "type": "object",
                     "properties": {
-                        "adminUser": {
+                        "user": {
                             "type": "string",
                             "description": "Grafana admin username",
-                            "default": "admin"
+                            "default": "elchi"
                         },
-                        "adminPassword": {
+                        "password": {
                             "type": "string",
                             "description": "Grafana admin password",
-                            "default": "admin"
+                            "default": "elchi"
                         }
                     }
                 },
@@ -244,6 +259,43 @@
                                     "default": {}
                                 }
                             }
+                        }
+                    }
+                },
+                "gslb": {
+                    "type": "object",
+                    "description": "GSLB CoreDNS plugin configuration",
+                    "properties": {
+                        "zone": {
+                            "type": "string",
+                            "description": "DNS zone for GSLB resolution",
+                            "default": "gslb.elchi"
+                        },
+                        "secret": {
+                            "type": "string",
+                            "description": "Shared secret for CoreDNS plugin authentication (minimum 8 characters)",
+                            "minLength": 8,
+                            "default": "elchi-secret-change-me"
+                        },
+                        "ttl": {
+                            "type": "integer",
+                            "description": "Default TTL for DNS records in seconds",
+                            "default": 300
+                        },
+                        "syncInterval": {
+                            "type": "string",
+                            "description": "Interval for syncing DNS records from backend",
+                            "default": "5m"
+                        },
+                        "timeout": {
+                            "type": "string",
+                            "description": "HTTP request timeout for backend communication",
+                            "default": "10s"
+                        },
+                        "fallthrough": {
+                            "type": "boolean",
+                            "description": "Whether to pass unmatched queries to next plugin",
+                            "default": true
                         }
                     }
                 }

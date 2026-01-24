@@ -9,6 +9,7 @@ metadata:
     app: elchi-registry
     version: {{ $controllerVersion }}
     type: grpc
+    {{- include "elchi-backend.registry.labels" . | nindent 4 }}
 spec:
   replicas: 1
   selector:
@@ -22,6 +23,7 @@ spec:
         app: elchi-registry
         version: {{ $controllerVersion }}
         type: grpc
+        {{- include "elchi-backend.registry.labels" . | nindent 8 }}
     spec:
       {{- if .Values.global.installMongo }}
       initContainers:
@@ -33,12 +35,20 @@ spec:
         - name: elchi-registry
           image: "{{ .Values.image.repository }}:{{ (index .Values.global.versions 0).tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           args: ["elchi-registry"]
           resources:
             {{- toYaml .Values.resources.registry | nindent 12 }}
           ports:
             - name: grpc
               containerPort: {{ .Values.service.registry.port }}
+              protocol: TCP
+            - name: metrics
+              containerPort: {{ .Values.service.registry.metricsPort }}
               protocol: TCP
           volumeMounts:
             - name: config-volume

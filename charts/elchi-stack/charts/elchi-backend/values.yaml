@@ -5,25 +5,25 @@ image:
 resources:
   controller:
     requests:
-      memory: "255Mi"
-      cpu: "150m"
+      memory: "64Mi"
+      cpu: "25m"
     limits:
-      memory: "512Mi"
-      cpu: "250m"
+      memory: "256Mi"
+      cpu: "200m"
   controlPlane:
     requests:
-      memory: "256Mi"
-      cpu: "150m"
+      memory: "64Mi"
+      cpu: "25m"
     limits:
-      memory: "512Mi"
-      cpu: "250m"
+      memory: "256Mi"
+      cpu: "200m"
   registry:
     requests:
-      memory: "256Mi"
-      cpu: "150m"
+      memory: "64Mi"
+      cpu: "25m"
     limits:
-      memory: "512Mi"
-      cpu: "250m"
+      memory: "256Mi"
+      cpu: "200m"
 
 service:
   type: ClusterIP
@@ -34,6 +34,7 @@ service:
     port: 18000
   registry:
     port: 9090
+    metricsPort: 9091
 
 configMap:
   name: elchi-backend-config

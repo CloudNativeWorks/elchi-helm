@@ -6,6 +6,7 @@ metadata:
   name: mongodb-service
   labels:
     app: mongodb
+    {{- include "mongodb.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:

@@ -1,0 +1,33 @@
+{{- if .Values.global.installGslb }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: elchi-coredns-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: elchi-coredns
+    {{- include "elchi-coredns.labels" . | nindent 4 }}
+data:
+  Corefile: |
+    {{ .Values.global.gslb.zone }}:{{ .Values.service.containerPort }} {
+        elchi {
+            endpoint http://elchi-registry.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:9090
+            secret {{ .Values.global.gslb.secret }}
+            ttl {{ .Values.global.gslb.ttl }}
+            sync_interval {{ .Values.global.gslb.syncInterval }}
+            timeout {{ .Values.global.gslb.timeout }}
+            {{- if .Values.global.gslb.fallthrough }}
+            fallthrough
+            {{- end }}
+        }
+        log
+        errors
+    }
+
+    .:{{ .Values.service.containerPort }} {
+        forward . {{ range $i, $forwarder := .Values.forwarders }}{{ if $i }} {{ end }}{{ $forwarder }}{{ end }}
+        log
+        errors
+        cache 30
+    }
+{{- end }}

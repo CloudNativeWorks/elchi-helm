@@ -2,9 +2,9 @@ apiVersion: v2
 name: elchi-stack
 description: A comprehensive Helm chart for deploying Elchi proxy management platform with UI, controller, control plane and registry components
 type: application
-version: 1.0.0
+version: 1.1.0
 appVersion: "v0.1.0"
-kubeVersion: ">=1.19.0-0"
+kubeVersion: ">=1.21.0-0"
 icon: "https://charts.elchi.io/logo.png"
 keywords:
   - proxy
@@ -36,9 +36,9 @@ annotations:
     - url: https://artifacthub.io/packages/helm/bitnami/mongodb
       title: MongoDB (optional)
   artifacthub.io/requirements: |
-    - Kubernetes 1.19+
+    - Kubernetes 1.21+
     - Helm 3.0.0+
-    - At least 2 CPU cores and 4GB RAM per node
+    - At least 1 CPU core and 2GB RAM per node
 
 dependencies:
   - name: elchi
@@ -62,3 +62,7 @@ dependencies:
   - name: grafana
     version: "1.0.0"
     repository: "file://charts/grafana"
+  - name: elchi-coredns
+    version: "1.0.0"
+    repository: "file://charts/elchi-coredns"
+    condition: global.installGslb

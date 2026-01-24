@@ -6,6 +6,7 @@ metadata:
   namespace: {{ $.Release.Namespace }}
   labels:
     app: mongodb
+    {{- include "mongodb.labels" . | nindent 4 }}
 spec:
   serviceName: mongodb-service
   replicas: {{ .Values.replicaCount }}
@@ -16,11 +17,16 @@ spec:
     metadata:
       labels:
         app: mongodb
+        {{- include "mongodb.labels" . | nindent 8 }}
     spec:
+      securityContext:
+        fsGroup: 999
       containers:
         - name: mongodb
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
           command:
             - bash
             - -c
@@ -80,7 +86,7 @@ spec:
           "helm.sh/resource-policy": delete
       spec:
         accessModes: [ "ReadWriteOnce" ]
-        storageClassName: {{ .Values.persistence.storageClass }}
+        storageClassName: {{ .Values.global.storageClass }}
         resources:
           requests:
             storage: {{ .Values.persistence.size }}

@@ -1,0 +1,15 @@
+{{- if .Values.global.installMongo }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: mongodb-pdb
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: mongodb
+    {{- include "mongodb.labels" . | nindent 4 }}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: mongodb
+{{- end }}

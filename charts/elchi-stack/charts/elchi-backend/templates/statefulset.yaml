@@ -10,6 +10,7 @@ metadata:
     app: elchi-controller
     version: {{ regexReplaceAll "-arm64$" $controllerVersion.tag "" }}
     type: rest
+    {{- include "elchi-backend.controller.labels" . | nindent 4 }}
 spec:
   serviceName: elchi-controller-{{ regexReplaceAll "-arm64$" $controllerVersion.tag "" | replace "." "-" }}-headless
   replicas: {{ .Values.global.elchiBackend.controllerDefaultReplicas }}
@@ -24,6 +25,7 @@ spec:
         app: elchi-controller
         version: {{ regexReplaceAll "-arm64$" $controllerVersion.tag "" }}
         type: rest
+        {{- include "elchi-backend.controller.labels" . | nindent 8 }}
     spec:
       {{- if .Values.global.installMongo }}
       initContainers:
@@ -35,6 +37,11 @@ spec:
         - name: elchi-controller
           image: "{{ .Values.image.repository }}:{{ $controllerVersion.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           args: ["elchi-controller"]
           resources:
             {{- toYaml .Values.resources.controller | nindent 12 }}
@@ -86,6 +93,7 @@ metadata:
     app: elchi-control-plane
     version: {{ regexReplaceAll "-arm64$" .tag "" }}
     type: grpc
+    {{- include "elchi-backend.controlplane.labels" $ | nindent 4 }}
 spec:
   serviceName: elchi-control-plane-{{ regexReplaceAll "-arm64$" .tag "" | replace "." "-" }}-headless
   replicas: {{ $.Values.global.elchiBackend.controlPlaneDefaultReplicas }}
@@ -100,6 +108,7 @@ spec:
         app: elchi-control-plane
         version: {{ regexReplaceAll "-arm64$" .tag "" }}
         type: grpc
+        {{- include "elchi-backend.controlplane.labels" $ | nindent 8 }}
     spec:
       {{- if $.Values.global.installMongo }}
       initContainers:
@@ -111,6 +120,11 @@ spec:
         - name: elchi-control-plane
           image: "{{ $.Values.image.repository }}:{{ .tag }}"
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           args: ["elchi-control-plane"]
           resources:
             {{- toYaml $.Values.resources.controlPlane | nindent 12 }}

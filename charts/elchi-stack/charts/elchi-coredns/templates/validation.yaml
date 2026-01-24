@@ -1,0 +1,23 @@
+{{- if .Values.global.installGslb }}
+
+{{- if not .Values.global.gslb }}
+{{- fail "ERROR: global.gslb configuration is required when installGslb is true" }}
+{{- end }}
+
+{{- if not .Values.global.gslb.zone }}
+{{- fail "ERROR: global.gslb.zone is required when installGslb is true. Please set --set global.gslb.zone=your-zone" }}
+{{- end }}
+
+{{- if eq .Values.global.gslb.zone "" }}
+{{- fail "ERROR: global.gslb.zone cannot be empty when installGslb is true" }}
+{{- end }}
+
+{{- if not .Values.global.gslb.secret }}
+{{- fail "ERROR: global.gslb.secret is required when installGslb is true. Please set --set global.gslb.secret=your-secret" }}
+{{- end }}
+
+{{- if eq .Values.global.gslb.secret "" }}
+{{- fail "ERROR: global.gslb.secret cannot be empty when installGslb is true" }}
+{{- end }}
+
+{{- end }}

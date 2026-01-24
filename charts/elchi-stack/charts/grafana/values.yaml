@@ -9,11 +9,11 @@ service:
 
 resources:
   requests:
+    memory: "64Mi"
+    cpu: "25m"
+  limits:
     memory: "256Mi"
     cpu: "200m"
-  limits:
-    memory: "1Gi"
-    cpu: "500m"
 
 # Admin credentials
 user: admin

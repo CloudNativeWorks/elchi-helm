@@ -10,6 +10,7 @@ metadata:
     app: elchi-controller
     version: {{ $controllerVersion }}
     type: rest
+    {{- include "elchi-backend.controller.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -36,6 +37,7 @@ metadata:
     app: elchi-controller
     version: {{ $controllerVersion }}
     type: rest
+    {{- include "elchi-backend.controller.labels" . | nindent 4 }}
 spec:
   clusterIP: None
   ports:
@@ -62,6 +64,7 @@ metadata:
     app: elchi-registry
     version: {{ $controllerVersion }}
     type: grpc
+    {{- include "elchi-backend.registry.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -69,6 +72,10 @@ spec:
       targetPort: {{ .Values.service.registry.port }}
       protocol: TCP
       name: grpc
+    - port: {{ .Values.service.registry.metricsPort }}
+      targetPort: {{ .Values.service.registry.metricsPort }}
+      protocol: TCP
+      name: metrics
   selector:
     app: elchi-registry
     version: {{ $controllerVersion }}
@@ -85,6 +92,7 @@ metadata:
     app: elchi-control-plane
     version: {{ regexReplaceAll "-arm64$" .tag "" }}
     type: grpc
+    {{- include "elchi-backend.controlplane.labels" $ | nindent 4 }}
 spec:
   clusterIP: None
   ports:
@@ -107,6 +115,7 @@ metadata:
     app: elchi-control-plane
     version: {{ regexReplaceAll "-arm64$" .tag "" }}
     type: grpc
+    {{- include "elchi-backend.controlplane.labels" $ | nindent 4 }}
 spec:
   type: {{ $.Values.service.type }}
   ports:
