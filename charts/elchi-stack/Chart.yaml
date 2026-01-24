@@ -38,7 +38,7 @@ annotations:
   artifacthub.io/requirements: |
     - Kubernetes 1.21+
     - Helm 3.0.0+
-    - At least 1 CPU core and 2GB RAM per node
+    - At least 2 CPU cores and 4GB RAM per node
 
 dependencies:
   - name: elchi

@@ -19,8 +19,8 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 |-------------|-----------------|-----------------|-------|
 | **Kubernetes** | 1.21 | 1.35+ | Uses `policy/v1` PDB (requires 1.21+) |
 | **Helm** | 3.0.0 | 3.x | Chart API v2 |
-| **CPU** | 1 core | - | Per node |
-| **Memory** | 2 GB | - | Per node |
+| **CPU** | 2 cores | - | Per node (1.3 cores for pods + system) |
+| **Memory** | 4 GB | - | Per node (2.5 GB for pods + system) |
 
 > **Tested Versions**: Kubernetes 1.21 - 1.35 (current latest)
 
@@ -91,18 +91,18 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 |-----------|-------------|---------|
 | `image.repository` | Elchi backend image repository | `"jhonbrownn/elchi-backend"` |
 | `image.pullPolicy` | Image pull policy | `"Always"` |
-| `resources.controller.requests.memory` | Controller service memory request | `"64Mi"` |
-| `resources.controller.requests.cpu` | Controller service CPU request | `"25m"` |
-| `resources.controller.limits.memory` | Controller service memory limit | `"256Mi"` |
-| `resources.controller.limits.cpu` | Controller service CPU limit | `"200m"` |
-| `resources.controlPlane.requests.memory` | Control Plane service memory request | `"64Mi"` |
-| `resources.controlPlane.requests.cpu` | Control Plane service CPU request | `"25m"` |
-| `resources.controlPlane.limits.memory` | Control Plane service memory limit | `"256Mi"` |
-| `resources.controlPlane.limits.cpu` | Control Plane service CPU limit | `"200m"` |
+| `resources.controller.requests.memory` | Controller service memory request | `"128Mi"` |
+| `resources.controller.requests.cpu` | Controller service CPU request | `"100m"` |
+| `resources.controller.limits.memory` | Controller service memory limit | `"2Gi"` |
+| `resources.controller.limits.cpu` | Controller service CPU limit | `"2000m"` |
+| `resources.controlPlane.requests.memory` | Control Plane service memory request | `"256Mi"` |
+| `resources.controlPlane.requests.cpu` | Control Plane service CPU request | `"100m"` |
+| `resources.controlPlane.limits.memory` | Control Plane service memory limit | `"4Gi"` |
+| `resources.controlPlane.limits.cpu` | Control Plane service CPU limit | `"1000m"` |
 | `resources.registry.requests.memory` | Registry service memory request | `"64Mi"` |
-| `resources.registry.requests.cpu` | Registry service CPU request | `"25m"` |
-| `resources.registry.limits.memory` | Registry service memory limit | `"256Mi"` |
-| `resources.registry.limits.cpu` | Registry service CPU limit | `"200m"` |
+| `resources.registry.requests.cpu` | Registry service CPU request | `"50m"` |
+| `resources.registry.limits.memory` | Registry service memory limit | `"512Mi"` |
+| `resources.registry.limits.cpu` | Registry service CPU limit | `"500m"` |
 | `service.type` | Kubernetes service type | `"ClusterIP"` |
 | `service.controller.port` | Controller REST service port | `8099` |
 | `service.controller.grpcPort` | Controller gRPC service port | `50051` |
@@ -125,8 +125,8 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 | `service.port` | Service port | `80` |
 | `resources.requests.memory` | Memory request | `"32Mi"` |
 | `resources.requests.cpu` | CPU request | `"10m"` |
-| `resources.limits.memory` | Memory limit | `"128Mi"` |
-| `resources.limits.cpu` | CPU limit | `"100m"` |
+| `resources.limits.memory` | Memory limit | `"256Mi"` |
+| `resources.limits.cpu` | CPU limit | `"200m"` |
 
 ## Envoy Chart Values
 
@@ -139,10 +139,10 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 | `service.type` | Kubernetes service type | `"NodePort"` |
 | `service.httpPort` | HTTP service port | `8080` |
 | `service.adminPort` | Admin service port | `9901` |
-| `resources.requests.memory` | Memory request | `"32Mi"` |
-| `resources.requests.cpu` | CPU request | `"10m"` |
-| `resources.limits.memory` | Memory limit | `"128Mi"` |
-| `resources.limits.cpu` | CPU limit | `"100m"` |
+| `resources.requests.memory` | Memory request | `"64Mi"` |
+| `resources.requests.cpu` | CPU request | `"50m"` |
+| `resources.limits.memory` | Memory limit | `"1Gi"` |
+| `resources.limits.cpu` | CPU limit | `"1000m"` |
 
 ## MongoDB Chart Values
 
@@ -156,10 +156,10 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 | `persistence.size` | PVC size | `"5Gi"` |
 | `service.type` | Kubernetes service type | `"ClusterIP"` |
 | `service.port` | Service port | `27017` |
-| `resources.requests.memory` | Memory request | `"128Mi"` |
-| `resources.requests.cpu` | CPU request | `"50m"` |
-| `resources.limits.memory` | Memory limit | `"512Mi"` |
-| `resources.limits.cpu` | CPU limit | `"500m"` |
+| `resources.requests.memory` | Memory request | `"256Mi"` |
+| `resources.requests.cpu` | CPU request | `"100m"` |
+| `resources.limits.memory` | Memory limit | `"2Gi"` |
+| `resources.limits.cpu` | CPU limit | `"1000m"` |
 
 ## Victoria Metrics Chart Values
 
@@ -172,10 +172,10 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 | `service.port` | Service port | `8428` |
 | `persistence.size` | Storage size for metrics data | `"5Gi"` |
 | `retentionPeriod` | Data retention period | `"15d"` |
-| `resources.requests.memory` | Memory request | `"64Mi"` |
-| `resources.requests.cpu` | CPU request | `"25m"` |
-| `resources.limits.memory` | Memory limit | `"256Mi"` |
-| `resources.limits.cpu` | CPU limit | `"200m"` |
+| `resources.requests.memory` | Memory request | `"128Mi"` |
+| `resources.requests.cpu` | CPU request | `"50m"` |
+| `resources.limits.memory` | Memory limit | `"2Gi"` |
+| `resources.limits.cpu` | CPU limit | `"1000m"` |
 
 ## OpenTelemetry Collector Chart Values
 
@@ -187,10 +187,10 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 | `service.type` | Kubernetes service type | `"ClusterIP"` |
 | `service.grpcPort` | gRPC service port | `4317` |
 | `service.httpPort` | HTTP service port | `4318` |
-| `resources.requests.memory` | Memory request | `"32Mi"` |
-| `resources.requests.cpu` | CPU request | `"10m"` |
-| `resources.limits.memory` | Memory limit | `"128Mi"` |
-| `resources.limits.cpu` | CPU limit | `"100m"` |
+| `resources.requests.memory` | Memory request | `"64Mi"` |
+| `resources.requests.cpu` | CPU request | `"25m"` |
+| `resources.limits.memory` | Memory limit | `"512Mi"` |
+| `resources.limits.cpu` | CPU limit | `"500m"` |
 
 ## Grafana Chart Values
 
@@ -203,8 +203,8 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 | `service.port` | Service port | `3000` |
 | `resources.requests.memory` | Memory request | `"64Mi"` |
 | `resources.requests.cpu` | CPU request | `"25m"` |
-| `resources.limits.memory` | Memory limit | `"256Mi"` |
-| `resources.limits.cpu` | CPU limit | `"200m"` |
+| `resources.limits.memory` | Memory limit | `"512Mi"` |
+| `resources.limits.cpu` | CPU limit | `"500m"` |
 | `datasource.name` | Datasource name | `"VictoriaMetrics"` |
 | `datasource.type` | Datasource type | `"prometheus"` |
 | `datasource.access` | Datasource access mode | `"proxy"` |
@@ -384,8 +384,8 @@ kubectl delete namespace elchi-stack
 | `service.dnsPort` | DNS service port | `53` |
 | `resources.requests.memory` | Memory request | `"32Mi"` |
 | `resources.requests.cpu` | CPU request | `"10m"` |
-| `resources.limits.memory` | Memory limit | `"128Mi"` |
-| `resources.limits.cpu` | CPU limit | `"100m"` |
+| `resources.limits.memory` | Memory limit | `"256Mi"` |
+| `resources.limits.cpu` | CPU limit | `"200m"` |
 | `forwarders` | DNS forwarders for non-GSLB queries | `["8.8.8.8", "8.8.4.4"]` |
 
 ## Notes
