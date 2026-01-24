@@ -12,7 +12,7 @@ global:
   installVictoriaMetrics: true
   installGslb: true
   internalCommunication: false
-  storageClass: "standard"  # Storage class for all PVCs (mongodb, victoriametrics)
+  storageClass: ""  # Storage class for all PVCs (mongodb, victoriametrics)
   mongodb:
     hosts: ""
     username: "elchi"
