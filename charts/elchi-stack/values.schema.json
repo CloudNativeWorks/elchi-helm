@@ -16,7 +16,10 @@
                     "default": ""
                 },
                 "port": {
-                    "type": "string",
+                    "oneOf": [
+                        {"type": "string"},
+                        {"type": "integer"}
+                    ],
                     "description": "Port for the Elchi API. If empty, uses 80/443 based on TLS",
                     "default": ""
                 },
@@ -109,7 +112,10 @@
                             "default": ""
                         },
                         "port": {
-                            "type": "string",
+                            "oneOf": [
+                                {"type": "string"},
+                                {"type": "integer"}
+                            ],
                             "description": "MongoDB port",
                             "default": ""
                         },
