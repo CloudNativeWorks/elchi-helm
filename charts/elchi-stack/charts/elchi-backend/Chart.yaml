@@ -3,7 +3,7 @@ name: elchi-backend
 description: Elchi Backend Services - Controller, Control Plane and Registry components
 type: application
 version: 1.0.0
-appVersion: "0.1.0"
+appVersion: "1.0.0"
 keywords:
   - backend
   - controller

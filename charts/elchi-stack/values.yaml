@@ -6,7 +6,7 @@ global:
   enableDemo: false
   timezone: ""  # Timezone for containers. Examples: "Europe/Istanbul", "UTC", "America/New_York". If empty, defaults to UTC.
   versions:
-    - tag: v0.1.0-v0.13.4-envoy1.36.2
+    - tag: v1.0.0-v0.13.4-envoy1.36.2
   installMongo: true
   installVictoriaMetrics: true
   installGslb: true

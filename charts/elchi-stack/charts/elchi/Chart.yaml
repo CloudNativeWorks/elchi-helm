@@ -3,7 +3,7 @@ name: elchi
 description: Elchi Frontend UI - Web interface for proxy configuration management
 type: application
 version: 1.0.0
-appVersion: "0.1.0"
+appVersion: "1.0.0"
 keywords:
   - frontend
   - ui
