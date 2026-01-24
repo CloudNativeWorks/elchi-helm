@@ -48,13 +48,7 @@ spec:
           volumeMounts:
             - name: envoy-config
               mountPath: /etc/envoy
-            - name: timezone
-              mountPath: /etc/localtime
-              readOnly: true
       volumes:
         - name: envoy-config
           configMap:
             name: envoy-config
-        - name: timezone
-          hostPath:
-            path: {{ $.Values.global.timezonePath | default "/etc/localtime" }}

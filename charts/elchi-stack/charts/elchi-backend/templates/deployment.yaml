@@ -53,9 +53,6 @@ spec:
           volumeMounts:
             - name: config-volume
               mountPath: /root/.configs
-            - name: timezone
-              mountPath: /etc/localtime
-              readOnly: true
           env:
             - name: TZ
               value: {{ $.Values.global.timezone | default "UTC" | quote }}
@@ -76,6 +73,3 @@ spec:
         - name: config-volume
           configMap:
             name: {{ .Values.configMap.name }}
-        - name: timezone
-          hostPath:
-            path: {{ $.Values.global.timezonePath | default "/etc/localtime" }}

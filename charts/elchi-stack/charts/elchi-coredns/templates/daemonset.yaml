@@ -51,9 +51,6 @@ spec:
             - name: config-volume
               mountPath: /etc/coredns
               readOnly: true
-            - name: timezone
-              mountPath: /etc/localtime
-              readOnly: true
           env:
             - name: TZ
               value: {{ $.Values.global.timezone | default "UTC" | quote }}
@@ -71,9 +68,6 @@ spec:
         - name: config-volume
           configMap:
             name: elchi-coredns-config
-        - name: timezone
-          hostPath:
-            path: {{ $.Values.global.timezonePath | default "/etc/localtime" }}
       tolerations:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists

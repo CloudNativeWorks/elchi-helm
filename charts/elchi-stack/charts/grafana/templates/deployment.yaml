@@ -87,9 +87,6 @@ spec:
           mountPath: /etc/grafana/provisioning/dashboards
         - name: grafana-dashboards
           mountPath: /etc/grafana/dashboards
-        - name: localtime
-          mountPath: /etc/localtime
-          readOnly: true
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
       volumes:
@@ -106,11 +103,3 @@ spec:
       - name: grafana-dashboards
         configMap:
           name: grafana-dashboards
-      - name: localtime
-        hostPath:
-          {{- if .Values.global.timezonePath }}
-          path: {{ .Values.global.timezonePath }}
-          {{- else }}
-          path: /etc/localtime
-          {{- end }}
-          type: File

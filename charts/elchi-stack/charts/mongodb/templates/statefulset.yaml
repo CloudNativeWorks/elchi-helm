@@ -68,16 +68,10 @@ spec:
               mountPath: /data/db
             - name: mongodb-init
               mountPath: /docker-entrypoint-initdb.d
-            - name: timezone
-              mountPath: /etc/localtime
-              readOnly: true
       volumes:
         - name: mongodb-init
           configMap:
             name: mongodb-init
-        - name: timezone
-          hostPath:
-            path: {{ $.Values.global.timezonePath | default "/etc/localtime" }}
   volumeClaimTemplates:
     - metadata:
         name: mongodb-data

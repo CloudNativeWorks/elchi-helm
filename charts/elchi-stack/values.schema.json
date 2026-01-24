@@ -45,13 +45,8 @@
                 },
                 "timezone": {
                     "type": "string",
-                    "description": "Timezone configuration. If empty, will use host timezone",
+                    "description": "Timezone for containers. Examples: Europe/Istanbul, UTC. If empty, defaults to UTC",
                     "default": ""
-                },
-                "timezonePath": {
-                    "type": "string",
-                    "description": "Custom path to timezone file on host",
-                    "default": "/etc/localtime"
                 },
                 "internalCommunication": {
                     "type": "boolean",

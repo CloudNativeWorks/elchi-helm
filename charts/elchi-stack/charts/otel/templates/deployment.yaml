@@ -74,13 +74,7 @@ spec:
         - name: config
           mountPath: /etc/otel
           readOnly: true
-        - name: timezone
-          mountPath: /etc/localtime
-          readOnly: true
       volumes:
       - name: config
         configMap:
           name: otel-config
-      - name: timezone
-        hostPath:
-          path: /etc/localtime 

@@ -50,13 +50,6 @@ spec:
         volumeMounts:
         - name: storage
           mountPath: /victoria-metrics-data
-        - name: timezone
-          mountPath: /etc/localtime
-          readOnly: true
-      volumes:
-      - name: timezone
-        hostPath:
-          path: /etc/localtime
   volumeClaimTemplates:
   - metadata:
       name: storage
