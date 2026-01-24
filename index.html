@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elchi Helm Repository</title>
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -36,6 +37,11 @@
             border-radius: 4px;
             font-size: 0.875rem;
             font-weight: 500;
+            margin-left: 0.5rem;
+        }
+        .badge.secondary {
+            background: #6b7280;
+            font-size: 0.75rem;
         }
         pre {
             background: #1f2937;
@@ -54,6 +60,47 @@
             padding: 1rem;
             border-radius: 6px;
         }
+        .chart-item h3 {
+            margin: 0 0 0.5rem 0;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+        .chart-item p {
+            margin: 0.5rem 0;
+            color: #6b7280;
+        }
+        .versions-list {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        .versions-list summary {
+            cursor: pointer;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        .versions-list ul {
+            margin: 0.5rem 0 0 0;
+            padding-left: 1.5rem;
+        }
+        .versions-list li {
+            font-size: 0.875rem;
+            color: #374151;
+            margin: 0.25rem 0;
+        }
+        .versions-list a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        .versions-list a:hover {
+            text-decoration: underline;
+        }
+        .loading {
+            color: #6b7280;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -64,35 +111,28 @@
     </div>
 
     <div class="card">
-        <h2>🚀 Quick Start</h2>
+        <h2>Quick Start</h2>
         <h3>Add Repository</h3>
         <pre>helm repo add elchi https://charts.elchi.io
 helm repo update</pre>
-        
+
         <h3>Install Charts</h3>
         <pre># Complete platform
 helm install my-stack elchi/elchi-stack --set global.mainAddress="your-domain.com"
 
-# Discovery service only  
+# Discovery service only
 helm install my-discovery elchi/elchi-discovery</pre>
     </div>
 
     <div class="card">
-        <h2>📦 Available Charts</h2>
-        <div class="charts-grid">
-            <div class="chart-item">
-                <h3>elchi-stack <span class="badge">v1.0.0</span></h3>
-                <p>Complete proxy management platform with UI, controller, control plane and registry components</p>
-            </div>
-            <div class="chart-item">
-                <h3>elchi-discovery <span class="badge">v1.0.0</span></h3>
-                <p>Service discovery & registry component</p>
-            </div>
+        <h2>Available Charts</h2>
+        <div id="charts-container" class="charts-grid">
+            <p class="loading">Loading charts...</p>
         </div>
     </div>
 
     <div class="card">
-        <h2>📖 Documentation</h2>
+        <h2>Documentation</h2>
         <ul>
             <li><a href="https://github.com/cloudnativeworks/elchi-helm">GitHub Repository</a></li>
             <li><a href="index.yaml">Repository Index (YAML)</a></li>
@@ -101,12 +141,86 @@ helm install my-discovery elchi/elchi-discovery</pre>
     </div>
 
     <div class="card">
-        <h2>📋 Requirements</h2>
+        <h2>Requirements</h2>
         <ul>
-            <li><strong>Kubernetes:</strong> 1.19+</li>
+            <li><strong>Kubernetes:</strong> 1.21+</li>
             <li><strong>Helm:</strong> 3.0.0+</li>
-            <li><strong>Resources:</strong> 2+ CPU cores, 4GB+ RAM per node</li>
+            <li><strong>Resources:</strong> 1+ CPU core, 2GB+ RAM per node</li>
         </ul>
     </div>
+
+    <script>
+        const chartDescriptions = {
+            'elchi-stack': 'Complete proxy management platform with UI, controller, control plane and registry components',
+            'elchi-discovery': 'Service discovery & registry component for Kubernetes endpoints'
+        };
+
+        async function loadCharts() {
+            try {
+                const response = await fetch('index.yaml');
+                const yamlText = await response.text();
+                const data = jsyaml.load(yamlText);
+
+                const container = document.getElementById('charts-container');
+                container.innerHTML = '';
+
+                if (!data.entries) {
+                    container.innerHTML = '<p>No charts found</p>';
+                    return;
+                }
+
+                // Sort chart names
+                const chartNames = Object.keys(data.entries).sort();
+
+                for (const chartName of chartNames) {
+                    const versions = data.entries[chartName];
+                    if (!versions || versions.length === 0) continue;
+
+                    // Sort versions (newest first)
+                    versions.sort((a, b) => {
+                        const dateA = new Date(a.created || 0);
+                        const dateB = new Date(b.created || 0);
+                        return dateB - dateA;
+                    });
+
+                    const latestVersion = versions[0];
+                    const description = chartDescriptions[chartName] || latestVersion.description || 'No description available';
+
+                    const chartDiv = document.createElement('div');
+                    chartDiv.className = 'chart-item';
+
+                    let versionsHtml = '';
+                    if (versions.length > 1) {
+                        versionsHtml = `
+                            <details class="versions-list">
+                                <summary>All versions (${versions.length})</summary>
+                                <ul>
+                                    ${versions.map(v => `<li><a href="${v.urls?.[0] || '#'}">${v.version}</a> (App: ${v.appVersion || 'N/A'})</li>`).join('')}
+                                </ul>
+                            </details>
+                        `;
+                    }
+
+                    chartDiv.innerHTML = `
+                        <h3>
+                            ${chartName}
+                            <span class="badge">v${latestVersion.version}</span>
+                        </h3>
+                        <p>${description}</p>
+                        ${versionsHtml}
+                    `;
+
+                    container.appendChild(chartDiv);
+                }
+            } catch (error) {
+                console.error('Error loading charts:', error);
+                document.getElementById('charts-container').innerHTML =
+                    '<p>Error loading charts. Please check <a href="index.yaml">index.yaml</a> directly.</p>';
+            }
+        }
+
+        // Load charts when page loads
+        document.addEventListener('DOMContentLoaded', loadCharts);
+    </script>
 </body>
 </html>
