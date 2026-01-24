@@ -17,5 +17,11 @@ dependencies:
 - name: victoriametrics
   repository: file://charts/victoriametrics
   version: 1.0.0
-digest: sha256:11d4504c11573e060ce1b46925ee79d0ecf08b2f90b3e7031804409bae65e958
-generated: "2025-08-07T20:07:51.112682+03:00"
+- name: grafana
+  repository: file://charts/grafana
+  version: 1.0.0
+- name: elchi-coredns
+  repository: file://charts/elchi-coredns
+  version: 1.0.0
+digest: sha256:402996b135133c705f15b961cc66eb6ae6e828b5fe7841b49dfae38b717b8a58
+generated: "2026-01-24T14:45:55.574733+03:00"
