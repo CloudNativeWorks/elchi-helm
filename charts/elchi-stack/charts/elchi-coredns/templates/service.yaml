@@ -10,12 +10,12 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.dnsPort }}
-      targetPort: {{ .Values.service.dnsPort }}
+    - port: {{ .Values.service.hostPort }}
+      targetPort: {{ .Values.service.containerPort }}
       protocol: UDP
       name: dns-udp
-    - port: {{ .Values.service.dnsPort }}
-      targetPort: {{ .Values.service.dnsPort }}
+    - port: {{ .Values.service.hostPort }}
+      targetPort: {{ .Values.service.containerPort }}
       protocol: TCP
       name: dns-tcp
   selector:
