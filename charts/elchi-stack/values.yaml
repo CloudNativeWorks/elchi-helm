@@ -9,7 +9,7 @@ global:
     - tag: v1.0.0-v0.13.4-envoy1.36.2
   installMongo: true
   installVictoriaMetrics: true
-  installGslb: true
+  installGslb: false
   internalCommunication: false
   storageClass: ""  # Storage class for all PVCs (mongodb, victoriametrics)
   mongodb:

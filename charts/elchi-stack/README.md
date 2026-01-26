@@ -399,6 +399,27 @@ kubectl delete namespace elchi-stack
 - When `installMongo: false`, you must provide external MongoDB connection details via `global.mongodb.*` parameters
 - When `installVictoriaMetrics: false`, you must provide external Victoria Metrics endpoint via `global.victoriametrics.endpoint`
 
+### GSLB CoreDNS Requirements
+
+⚠️ **Important**: When enabling GSLB (`global.installGslb: true`), the following requirements apply:
+
+- **Port 53 must be available** on all Kubernetes nodes where CoreDNS will run
+- The CoreDNS DaemonSet uses `hostPort: 53` to bind directly to the node's DNS port
+- If `node-local-dns` or another DNS service is already using port 53, the pods will fail to schedule with error: `didn't have free ports for the requested pod ports`
+
+**Alternative: External GSLB Installation**
+
+If port 53 is not available in your Kubernetes cluster (e.g., `node-local-dns` is running), you can install Elchi GSLB externally:
+
+1. Set `global.installGslb: false` in your values file
+2. Download and install the standalone GSLB binary from: https://github.com/CloudNativeWorks/elchi-gslb/releases
+3. Configure the external GSLB to connect to your Elchi Registry service
+
+This approach is recommended for:
+- Clusters with `node-local-dns` or other DNS caching solutions
+- Environments where you need more control over DNS infrastructure
+- Multi-cluster GSLB deployments
+
 ### Envoy Service Configuration
 - **NodePort with auto-assign**: Set `global.envoy.service.httpNodePort: null` for automatic port assignment (default)
 - **NodePort with fixed port**: Set `global.envoy.service.httpNodePort: 30080` for stable port across deployments

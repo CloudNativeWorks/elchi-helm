@@ -17,8 +17,12 @@
                 },
                 "port": {
                     "oneOf": [
-                        {"type": "string"},
-                        {"type": "integer"}
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "integer"
+                        }
                     ],
                     "description": "Port for the Elchi API. If empty, uses 80/443 based on TLS",
                     "default": ""
@@ -41,7 +45,7 @@
                 "installGslb": {
                     "type": "boolean",
                     "description": "Whether to deploy GSLB CoreDNS plugin",
-                    "default": true
+                    "default": false
                 },
                 "timezone": {
                     "type": "string",
@@ -108,8 +112,12 @@
                         },
                         "port": {
                             "oneOf": [
-                                {"type": "string"},
-                                {"type": "integer"}
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
                             ],
                             "description": "MongoDB port",
                             "default": ""
@@ -186,7 +194,9 @@
                             "default": "5h"
                         }
                     },
-                    "required": ["secret"]
+                    "required": [
+                        "secret"
+                    ]
                 },
                 "cors": {
                     "type": "object",
@@ -223,7 +233,11 @@
                                 "type": {
                                     "type": "string",
                                     "description": "Kubernetes service type for Envoy",
-                                    "enum": ["ClusterIP", "NodePort", "LoadBalancer"],
+                                    "enum": [
+                                        "ClusterIP",
+                                        "NodePort",
+                                        "LoadBalancer"
+                                    ],
                                     "default": "NodePort"
                                 },
                                 "httpNodePort": {
@@ -301,7 +315,9 @@
                     }
                 }
             },
-            "required": ["mainAddress"]
+            "required": [
+                "mainAddress"
+            ]
         }
     }
 }
