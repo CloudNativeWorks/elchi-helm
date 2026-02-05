@@ -35,7 +35,6 @@ spec:
               value: {{ $.Values.global.timezone | default "UTC" | quote }}
           command: ["/usr/local/bin/envoy"]
           args:
-            - -l debug
             - -c
             - /etc/envoy/envoy.yaml
           ports:
