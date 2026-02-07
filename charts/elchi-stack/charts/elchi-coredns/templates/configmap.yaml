@@ -9,25 +9,54 @@ metadata:
     {{- include "elchi-coredns.labels" . | nindent 4 }}
 data:
   Corefile: |
-    {{ .Values.global.gslb.zone }}:{{ .Values.service.containerPort }} {
+    {{ .Values.global.gslb.zone }}:{{ .Values.dns.port }} {
+        bind {{ .Values.dns.bindAddress }}
         elchi {
-            endpoint http://elchi-registry.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:9090
+            endpoint http://envoy-service.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}:8080
             secret {{ .Values.global.gslb.secret }}
+            node_ip {{ .Values.dns.bindAddress }}
             ttl {{ .Values.global.gslb.ttl }}
             sync_interval {{ .Values.global.gslb.syncInterval }}
             timeout {{ .Values.global.gslb.timeout }}
-            {{- if .Values.global.gslb.fallthrough }}
             fallthrough
-            {{- end }}
         }
+        file /etc/coredns/{{ .Values.global.gslb.zone }}.db {{ .Values.global.gslb.zone }}
         log
         errors
     }
 
-    .:{{ .Values.service.containerPort }} {
+    .:{{ .Values.dns.port }} {
+        bind {{ .Values.dns.bindAddress }}
         forward . {{ range $i, $forwarder := .Values.forwarders }}{{ if $i }} {{ end }}{{ $forwarder }}{{ end }}
         log
         errors
         cache 30
     }
+
+  {{ .Values.global.gslb.zone }}.db: |
+    $ORIGIN {{ .Values.global.gslb.zone }}.
+    $TTL {{ .Values.global.gslb.ttl }}
+
+    @ IN SOA {{ (index .Values.global.gslb.nameservers 0).name }}.{{ .Values.global.gslb.zone }}. {{ .Values.global.gslb.adminEmail | replace "@" "." }}. (
+        {{ now | date "2006010215" }} ; serial (YYYYMMDDHH)
+        3600       ; refresh
+        900        ; retry
+        604800     ; expire
+        300        ; minimum TTL
+    )
+
+    ; NS records
+    {{- range .Values.global.gslb.nameservers }}
+    @ IN NS {{ .name }}.{{ $.Values.global.gslb.zone }}.
+    {{- end }}
+
+    ; Nameserver A records (glue)
+    {{- range .Values.global.gslb.nameservers }}
+    {{ .name }} IN A {{ .ip }}
+    {{- end }}
+
+    ; Static DNS records
+    {{- range .Values.global.gslb.staticRecords }}
+    {{ .name }} IN {{ .type }} {{ .value }}
+    {{- end }}
 {{- end }}

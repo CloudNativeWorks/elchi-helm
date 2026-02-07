@@ -10,7 +10,7 @@ metadata:
     app: elchi-registry
     {{- include "elchi-backend.registry.labels" . | nindent 4 }}
 spec:
-  minAvailable: 1
+  maxUnavailable: 1
   selector:
     matchLabels:
       app: elchi-registry
@@ -25,7 +25,7 @@ metadata:
     app: elchi-controller
     {{- include "elchi-backend.controller.labels" . | nindent 4 }}
 spec:
-  minAvailable: 1
+  maxUnavailable: 1
   selector:
     matchLabels:
       app: elchi-controller
@@ -43,7 +43,7 @@ metadata:
     app: elchi-control-plane
     {{- include "elchi-backend.controlplane.labels" $ | nindent 4 }}
 spec:
-  minAvailable: 1
+  maxUnavailable: 1
   selector:
     matchLabels:
       app: elchi-control-plane

@@ -3,4 +3,4 @@ name: elchi-coredns
 description: Elchi CoreDNS GSLB plugin - Global Server Load Balancing DNS resolution
 type: application
 version: 1.0.0
-appVersion: "1.0.0"
+appVersion: "0.1.1"

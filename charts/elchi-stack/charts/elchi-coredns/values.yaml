@@ -1,7 +1,7 @@
 image:
   repository: jhonbrownn/elchi-coredns
-  tag: latest
-  pullPolicy: IfNotPresent
+  tag: v0.1.1
+  pullPolicy: Always
 
 resources:
   requests:
@@ -11,12 +11,9 @@ resources:
     memory: "256Mi"
     cpu: "200m"
 
-service:
-  type: ClusterIP
-  # containerPort: internal port CoreDNS listens on (non-privileged)
-  containerPort: 1053
-  # hostPort: external port exposed on each node
-  hostPort: 53
+dns:
+  port: 53
+  bindAddress: "{$NODE_IP}"  # Injected via Downward API (status.hostIP)
 
 forwarders:
   - "8.8.8.8"

@@ -306,11 +306,6 @@
                             "type": "string",
                             "description": "HTTP request timeout for backend communication",
                             "default": "10s"
-                        },
-                        "fallthrough": {
-                            "type": "boolean",
-                            "description": "Whether to pass unmatched queries to next plugin",
-                            "default": true
                         }
                     }
                 }

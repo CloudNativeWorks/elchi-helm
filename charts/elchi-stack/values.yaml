@@ -45,9 +45,18 @@ global:
       adminNodePort: null   # Optional: Set a fixed port (e.g., 30901), or leave null for auto-assign
       annotations: {}       # Cloud provider specific annotations (e.g., AWS NLB, GCP internal LB)
   gslb:
-    zone: "gslb.elchi"
+    zone: ""  # Required: domain name (e.g., "example.com")
     secret: "cTs3vymP2sV8nQ3wT6yR23jL5bH721A0cE1gDdfyuv2I6vN8xM4q6" # important! change this value
     ttl: 300
     syncInterval: "1m"
-    timeout: "15s"
-    fallthrough: true
+    timeout: "4s" # must be less than syncInterval
+    adminEmail: ""  # Required: SOA admin email (e.g., "admin@example.com")
+    nameservers: []
+    #  - name: "ns1"
+    #    ip: "1.2.3.4"
+    #  - name: "ns2"
+    #    ip: "5.6.7.8"
+    staticRecords: []
+    #  - name: "www"
+    #    type: "A"
+    #    value: "1.2.3.4"

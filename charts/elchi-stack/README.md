@@ -78,12 +78,14 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 | `global.jwt.accessTokenDuration` | Access token expiration duration | `"1h"` |
 | `global.jwt.refreshTokenDuration` | Refresh token expiration duration | `"5h"` |
 | `global.cors.allowedOrigins` | CORS allowed origins (use "*" for all, or comma-separated domains) | `"*"` |
-| `global.gslb.zone` | DNS zone for GSLB resolution | `"gslb.elchi"` |
-| `global.gslb.secret` | Shared secret for CoreDNS plugin authentication | `"elchi-secret-change-me"` |
-| `global.gslb.ttl` | Default TTL for DNS records in seconds | `300` |
-| `global.gslb.syncInterval` | Interval for syncing DNS records from backend | `"5m"` |
-| `global.gslb.timeout` | HTTP request timeout for backend communication | `"10s"` |
-| `global.gslb.fallthrough` | Whether to pass unmatched queries to next plugin | `true` |
+| `global.gslb.zone` | DNS zone for GSLB resolution (Required) | `""` |
+| `global.gslb.secret` | Shared secret for CoreDNS plugin authentication (min 8 chars, Required) | `"cTs3vym..."` |
+| `global.gslb.ttl` | Default TTL for DNS records in seconds (min: 1) | `300` |
+| `global.gslb.syncInterval` | Interval for syncing DNS records from backend (min: 5s, max: 5m). Must be greater than timeout | `"1m"` |
+| `global.gslb.timeout` | HTTP request timeout for backend communication (min: 1s). Must be less than syncInterval | `"4s"` |
+| `global.gslb.adminEmail` | SOA admin email for DNS zone (Required) | `""` |
+| `global.gslb.nameservers` | List of authoritative nameservers `[{name, ip}]` (Required) | `[]` |
+| `global.gslb.staticRecords` | Static DNS records `[{name, type, value}]` | `[]` |
 
 ## ElchiBackend Chart Values
 
@@ -378,15 +380,28 @@ kubectl delete namespace elchi-stack
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `image.repository` | CoreDNS image repository | `"jhonbrownn/elchi-coredns"` |
-| `image.tag` | CoreDNS image tag | `"latest"` |
-| `image.pullPolicy` | Image pull policy | `"IfNotPresent"` |
-| `service.type` | Kubernetes service type | `"ClusterIP"` |
-| `service.dnsPort` | DNS service port | `53` |
+| `image.tag` | CoreDNS image tag | `"v0.1.1"` |
+| `image.pullPolicy` | Image pull policy | `"Always"` |
+| `dns.port` | DNS listen port | `53` |
+| `dns.bindAddress` | Bind address for CoreDNS (uses Downward API for node IP) | `"{$NODE_IP}"` |
 | `resources.requests.memory` | Memory request | `"32Mi"` |
 | `resources.requests.cpu` | CPU request | `"10m"` |
 | `resources.limits.memory` | Memory limit | `"256Mi"` |
 | `resources.limits.cpu` | CPU limit | `"200m"` |
 | `forwarders` | DNS forwarders for non-GSLB queries | `["8.8.8.8", "8.8.4.4"]` |
+
+### CoreDNS Plugin Parameters
+
+The `elchi` CoreDNS plugin accepts the following parameters in the Corefile:
+
+| Parameter | Min | Max | Default | Constraint |
+|-----------|-----|-----|---------|------------|
+| `sync_interval` | 5s | 5m | 1m | Must be greater than `timeout` |
+| `timeout` | 1s | - | 4s | Must be less than `sync_interval` |
+| `ttl` | 1 | - | 300 | - |
+| `secret` | 8 chars | - | - | Required |
+| `node_ip` | - | - | - | Required |
+| `webhook` | - | - | :8053 | Optional, health/ready endpoint |
 
 ## Notes
 
@@ -401,22 +416,45 @@ kubectl delete namespace elchi-stack
 
 ### GSLB CoreDNS Requirements
 
-⚠️ **Important**: When enabling GSLB (`global.installGslb: true`), the following requirements apply:
+When enabling GSLB (`global.installGslb: true`), the following requirements apply:
 
-- **Port 53 must be available** on all Kubernetes nodes where CoreDNS will run
-- The CoreDNS DaemonSet uses `hostPort: 53` to bind directly to the node's DNS port
-- If `node-local-dns` or another DNS service is already using port 53, the pods will fail to schedule with error: `didn't have free ports for the requested pod ports`
+- CoreDNS runs as a **DaemonSet** with `hostNetwork: true`, binding to each node's IP on port 53
+- The image must have `setcap cap_net_bind_service=+ep` applied (runs as non-root user 1000)
+- On multi-node clusters, the scheduler **prefers** worker nodes but will also schedule on control-plane nodes if needed (single-node clusters)
+- `node-local-dns` or `systemd-resolved` on different IPs (e.g., 169.254.25.10, 127.0.0.53) do not conflict since CoreDNS binds to the node's real IP
+
+**GSLB Configuration Example:**
+
+```yaml
+global:
+  installGslb: true
+  gslb:
+    zone: "example.com"
+    secret: "your-secret-min-8-chars"
+    ttl: 300
+    syncInterval: "1m"    # min: 5s, max: 5m
+    timeout: "4s"         # must be less than syncInterval
+    adminEmail: "admin@example.com"
+    nameservers:
+      - name: "ns1"
+        ip: "1.2.3.4"
+      - name: "ns2"
+        ip: "5.6.7.8"
+    staticRecords:
+      - name: "www"
+        type: "A"
+        value: "1.2.3.4"
+```
 
 **Alternative: External GSLB Installation**
 
-If port 53 is not available in your Kubernetes cluster (e.g., `node-local-dns` is running), you can install Elchi GSLB externally:
+If you prefer to run GSLB outside Kubernetes:
 
 1. Set `global.installGslb: false` in your values file
 2. Download and install the standalone GSLB binary from: https://github.com/CloudNativeWorks/elchi-gslb/releases
-3. Configure the external GSLB to connect to your Elchi Registry service
+3. Configure the external GSLB to connect to your Elchi service
 
 This approach is recommended for:
-- Clusters with `node-local-dns` or other DNS caching solutions
 - Environments where you need more control over DNS infrastructure
 - Multi-cluster GSLB deployments
 

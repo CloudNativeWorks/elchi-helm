@@ -104,6 +104,13 @@ data:
                       timeout: 0s
                       idle_timeout: 0s
                   {{- end }}
+                  # GSLB DNS snapshot endpoint
+                  - match:
+                      prefix: "/dns/"
+                    route:
+                      cluster: controller-rest-cluster
+                      timeout: 0s
+                      idle_timeout: 0s
                   # Controller REST routing (from-elchi requests)
                   - match:
                       prefix: "/"
