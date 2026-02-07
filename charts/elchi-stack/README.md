@@ -36,7 +36,9 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 ## Available Versions
 > Syntax: `<elchiBackendVersion>`-`<goControlPlaneVersion>`-`<envoyVersion>`
 
-- `v0.1.0-v0.13.4-envoy1.36.2`
+- `v1.0.0-v0.13.4-envoy1.35.3`
+- `v1.0.0-v0.13.4-envoy1.36.2`
+- `v1.0.0-v0.13.4-envoy1.37.0`
 
 ## Global Values
 
