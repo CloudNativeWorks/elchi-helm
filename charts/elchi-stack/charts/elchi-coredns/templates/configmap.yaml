@@ -18,6 +18,12 @@ data:
             ttl {{ .Values.global.gslb.ttl }}
             sync_interval {{ .Values.global.gslb.syncInterval }}
             timeout {{ .Values.global.gslb.timeout }}
+            {{- if .Values.global.gslb.regions }}
+            regions {{ .Values.global.gslb.regions | join " " }}
+            {{- end }}
+            {{- if .Values.global.gslb.tlsSkipVerify }}
+            tls_skip_verify
+            {{- end }}
             fallthrough
         }
         file /etc/coredns/{{ .Values.global.gslb.zone }}.db {{ .Values.global.gslb.zone }}

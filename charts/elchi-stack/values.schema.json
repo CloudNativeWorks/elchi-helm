@@ -306,6 +306,61 @@
                             "type": "string",
                             "description": "HTTP request timeout for backend communication",
                             "default": "10s"
+                        },
+                        "adminEmail": {
+                            "type": "string",
+                            "description": "SOA admin email for DNS zone",
+                            "default": ""
+                        },
+                        "nameservers": {
+                            "type": "array",
+                            "description": "List of authoritative nameservers",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "ip": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": ["name", "ip"]
+                            },
+                            "default": []
+                        },
+                        "staticRecords": {
+                            "type": "array",
+                            "description": "Static DNS records",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "value": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": ["name", "type", "value"]
+                            },
+                            "default": []
+                        },
+                        "regions": {
+                            "type": "array",
+                            "description": "Optional list of GSLB regions for geographic routing",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": []
+                        },
+                        "tlsSkipVerify": {
+                            "type": "boolean",
+                            "description": "Skip TLS certificate verification for backend communication",
+                            "default": false
                         }
                     }
                 }

@@ -60,3 +60,7 @@ global:
     #  - name: "www"
     #    type: "A"
     #    value: "1.2.3.4"
+    regions: []
+    #  - "eu-west-1"
+    #  - "us-east-1"
+    tlsSkipVerify: false

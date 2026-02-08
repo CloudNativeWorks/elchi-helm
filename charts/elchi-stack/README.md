@@ -88,6 +88,8 @@ Elchi is a proxy management platform that simplifies Envoy proxy configuration t
 | `global.gslb.adminEmail` | SOA admin email for DNS zone (Required) | `""` |
 | `global.gslb.nameservers` | List of authoritative nameservers `[{name, ip}]` (Required) | `[]` |
 | `global.gslb.staticRecords` | Static DNS records `[{name, type, value}]` | `[]` |
+| `global.gslb.regions` | Optional list of GSLB regions for geographic routing | `[]` |
+| `global.gslb.tlsSkipVerify` | Skip TLS certificate verification for backend communication | `false` |
 
 ## ElchiBackend Chart Values
 
@@ -403,6 +405,8 @@ The `elchi` CoreDNS plugin accepts the following parameters in the Corefile:
 | `ttl` | 1 | - | 300 | - |
 | `secret` | 8 chars | - | - | Required |
 | `node_ip` | - | - | - | Required |
+| `regions` | - | - | - | Optional, space-separated list |
+| `tls_skip_verify` | - | - | false | Optional, skip TLS cert verification |
 | `webhook` | - | - | :8053 | Optional, health/ready endpoint |
 
 ## Notes
@@ -446,6 +450,9 @@ global:
       - name: "www"
         type: "A"
         value: "1.2.3.4"
+    regions:              # optional
+      - "eu-west-1"
+      - "us-east-1"
 ```
 
 **Alternative: External GSLB Installation**
