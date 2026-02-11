@@ -24,6 +24,7 @@ data:
             {{- if .Values.global.gslb.tlsSkipVerify }}
             tls_skip_verify
             {{- end }}
+            webhook :8053
             fallthrough
         }
         file /etc/coredns/{{ .Values.global.gslb.zone }}.db {{ .Values.global.gslb.zone }}
